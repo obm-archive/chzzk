@@ -4,6 +4,7 @@
 
   var SERVICE = '치지직로그';
   var TODAY = '2026-11-26';
+  var PAGE_SIZE = 5;
   var CATEGORY = { talk: '토크' };
   var M = window.MOCK;
   var TERM_TYPES = ['닉네임', '밈·유행어', '인물', '게임 용어', '기타'];
@@ -109,6 +110,23 @@
   }
   function line(inner) { return '<div class="line">' + inner + '</div>'; }
   function ml(label) { return '<span class="m-label">' + esc(label) + '</span>'; }
+  function pageOf(list, q) {
+    var n = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+    var p = Math.min(Math.max(parseInt(q.p || '1', 10) || 1, 1), n);
+    return { items: list.slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE), p: p, n: n, total: list.length };
+  }
+  function pager(pg, base) {
+    if (pg.n < 2) return '';
+    var h = '<div class="inline pager"><button class="pager-btn" data-go="' + esc(base) + '&p=' + (pg.p - 1) + '"' + (pg.p < 2 ? ' disabled' : '') + '>‹</button>';
+    for (var i = 1; i <= pg.n; i++) h += '<button class="pager-btn' + (i === pg.p ? ' on' : '') + '" data-go="' + esc(base) + '&p=' + i + '">' + i + '</button>';
+    return h + '<button class="pager-btn" data-go="' + esc(base) + '&p=' + (pg.p + 1) + '"' + (pg.p >= pg.n ? ' disabled' : '') + '>›</button></div>';
+  }
+  function toolbar(total, picked, action) {
+    return '<div class="inline"><span class="small sub grow">전체 ' + total + '건' + (picked === null ? '' : ' / 선택 ' + picked + '건') + '</span>' + (action || '') + '</div>';
+  }
+  function selCount(prefix, ids) {
+    return ids.filter(function (id) { return state.sel[prefix + id]; }).length;
+  }
   function chips(list) {
     return list.map(function (k) { return '<span class="chip">' + esc(k) + '</span>'; }).join('');
   }
@@ -214,8 +232,10 @@
       categories().map(function (c) {
         return '<button class="chip' + (cat === c ? ' on' : '') + '" data-go="home?r=' + r + '&cat=' + encodeURIComponent(c) + '">' + esc(catLabel(c)) + '</button>';
       }).join('') + '</div>';
-    var list = M.posts.filter(function (p) { return !cat || p.cat === cat; });
-    h += '<div class="gallery">' + list.map(function (p) { return card(p, ''); }).join('') + '</div>';
+    var pg = pageOf(M.posts.filter(function (p) { return !cat || p.cat === cat; }), q);
+    h += toolbar(pg.total, null);
+    h += '<div class="gallery">' + pg.items.map(function (p) { return card(p, ''); }).join('') + '</div>';
+    h += pager(pg, 'home?r=' + r + (cat ? '&cat=' + encodeURIComponent(cat) : ''));
     return shell('home', r, h);
   }
 
@@ -256,11 +276,12 @@
         }
         hits.push({ p: p, segs: segs });
       });
-      h += '<div class="small sub">검색 결과 ' + hits.length + '건</div>';
+      var pg = pageOf(hits, q);
+      h += toolbar(pg.total, null);
       if (!hits.length) h += '<div class="notice">검색 결과가 없습니다. 다른 조건으로 검색해 보세요.</div>';
-      else h += '<div class="gallery">' + hits.map(function (x) {
+      else h += '<div class="gallery">' + pg.items.map(function (x) {
         return card(x.p, x.segs.length ? '일치 구간 ' + x.segs.length + '건' : '', x.segs.length ? x.segs[0] : undefined);
-      }).join('') + '</div>';
+      }).join('') + '</div>' + pager(pg, 'search?' + ['r=' + r].concat(['q', 'from', 'to', 'cat'].filter(function (k) { return q[k]; }).map(function (k) { return k + '=' + encodeURIComponent(q[k]); })).join('&'));
     }
     return shell('search', r, h);
   }
@@ -306,20 +327,26 @@
   }
 
   /* ── 화면: 용어집 ── */
+  function canEditTerm(g, admin) { return admin || g.author === '나'; }
   function vGlossary(q) {
     var r = q.r || 'user';
     var admin = r === 'admin';
-    var h = '<div class="inline"><h1 class="title grow">용어집</h1>' + btn('용어 추가', 'term-add', '', 'btn-primary') + '</div>';
-    h += '<div class="list"><div class="row row-head"><span class="c-s">용어</span><span class="c-s">분류</span><span class="c-fill">설명</span>' +
+    var pg = pageOf(state.gloss, q);
+    var ids = pg.items.filter(function (g) { return canEditTerm(g, admin); }).map(function (g) { return g.id; });
+    var picked = Object.keys(state.sel).filter(function (k) { return k.charAt(0) === 'g' && state.sel[k]; }).length;
+    var h = '<div class="inline"><h1 class="title grow">용어집</h1>' + btn('용어추가', 'term-add', '', 'btn-primary') + '</div>';
+    h += toolbar(pg.total, picked, btn('선택삭제', 'gdel-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger'));
+    h += '<div class="list"><div class="row row-head"><span class="c-xs"><label class="check"><input type="checkbox" data-act="gsel-all"></label></span><span class="c-s">용어</span><span class="c-s">분류</span><span class="c-fill">설명</span>' +
       '<span class="c-s c-hide">작성자</span><span class="c-act">관리</span></div>';
-    state.gloss.forEach(function (g) {
-      var own = g.author === '나';
+    pg.items.forEach(function (g) {
       var acts = '';
-      if (own || admin) acts += rbtn('수정', 'term-edit', g.id) + rbtn('삭제', 'term-del', g.id, 'btn-secondary is-danger');
-      h += '<div class="row">' + line('<span class="c-s bold">' + esc(g.term) + '</span><span class="c-s m-end"><span class="chip">' + esc(g.type) + '</span></span>') +
+      var can = canEditTerm(g, admin);
+      if (can) acts += rbtn('수정', 'term-edit', g.id) + rbtn('삭제', 'term-del', g.id, 'btn-secondary is-danger');
+      var box = can ? '<label class="check"><input type="checkbox" data-sel="g' + g.id + '"' + (state.sel['g' + g.id] ? ' checked' : '') + '></label>' : '';
+      h += '<div class="row">' + line('<span class="c-xs">' + box + '</span><span class="c-s bold">' + esc(g.term) + '</span><span class="c-s m-end"><span class="chip">' + esc(g.type) + '</span></span>') +
         '<span class="c-fill">' + esc(g.desc) + '</span><span class="c-s c-hide">' + esc(g.author) + '</span><span class="c-act">' + acts + '</span></div>';
     });
-    return shell('glossary', r, h + '</div>');
+    return shell('glossary', r, h + '</div>' + pager(pg, 'glossary?r=' + r));
   }
   function vMembers(q) {
     var t = q.t || 'pending';
@@ -332,15 +359,16 @@
       }).join('') + '</div>';
       list = list.filter(function (m) { return daysAgo(m.seen) >= state.idle; });
     }
-    var picked = list.filter(function (m) { return state.sel[m.id]; }).length;
-    if (t === 'ok') h += '<div class="inline"><span class="small sub grow">' + list.length + '명 · 선택 ' + picked + '명</span>' + btn('선택 탈퇴', 'withdraw-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger') + '</div>';
+    var pg = pageOf(list, q);
+    var picked = Object.keys(state.sel).filter(function (k) { return k.charAt(0) === 'm' && state.sel[k]; }).length;
+    h += t === 'ok' ? toolbar(pg.total, picked, btn('선택탈퇴', 'withdraw-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger')) : toolbar(pg.total, null);
     var head = '';
     if (t === 'pending') head = '<span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-s">등급 답변</span><span class="c-s">최근 게시물</span><span class="c-act">관리</span>';
     if (t === 'ok') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-m">최근 접속</span><span class="c-act">관리</span>';
     if (t === 'out') head = '<span class="c-fill">닉네임</span><span class="c-s">상태</span><span class="c-s">일자</span>';
     h += '<div class="list"><div class="row row-head">' + head + '</div>';
     if (!list.length) h += '<div class="row mute">해당하는 멤버가 없습니다.</div>';
-    list.forEach(function (m) {
+    pg.items.forEach(function (m) {
       var nick = '<span class="c-fill bold">' + esc(m.nick) + '</span>';
       var row = '';
       if (t === 'pending') {
@@ -350,7 +378,7 @@
           '<span class="c-act">' + rbtn('승인', 'm-approve', m.id, 'btn-primary') + rbtn('거절', 'm-reject', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'ok') {
-        row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="' + m.id + '"' + (state.sel[m.id] ? ' checked' : '') + '></label></span>' + nick + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
+        row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="m' + m.id + '"' + (state.sel['m' + m.id] ? ' checked' : '') + '></label></span>' + nick + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
           line(ml('최근 접속') + '<span class="c-m nowrap m-end">' + esc(m.seen) + ' <span class="mute">(' + daysAgo(m.seen) + '일 전)</span></span>') +
           '<span class="c-act">' + rbtn('탈퇴', 'withdraw', m.id, 'btn-secondary is-danger') + '</span>';
       }
@@ -359,28 +387,30 @@
       }
       h += '<div class="row">' + row + '</div>';
     });
-    return shell('members', 'admin', h + '</div>');
+    return shell('members', 'admin', h + '</div>' + pager(pg, 'members?r=admin&t=' + t));
   }
   function vOps(q) {
-    var t = q.t || 'todo';
+    var t = q.t || 'all';
     var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">네이버 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
-    h += tabs([['todo', '처리 필요', 'ops?r=admin&t=todo'], ['all', '전체', 'ops?r=admin&t=all'], ['hidden', '숨김', 'ops?r=admin&t=hidden']], t);
+    h += tabs([['all', '전체', 'ops?r=admin&t=all'], ['todo', '처리필요', 'ops?r=admin&t=todo'], ['hidden', '숨김', 'ops?r=admin&t=hidden']], t);
     var list = state.ops.filter(function (o) {
       if (t === 'hidden') return o.hidden;
       if (o.hidden) return false;
       return t === 'all' || o.st !== '완료';
     });
+    var pg = pageOf(list, q);
+    h += toolbar(pg.total, null);
     h += '<div class="list"><div class="row row-head"><span class="c-s">방송 번호</span><span class="c-s">상태</span><span class="c-fill">제목</span><span class="c-m c-hide">시작</span><span class="c-act">관리</span></div>';
     if (!list.length) h += '<div class="row mute">해당하는 방송이 없습니다.</div>';
-    list.forEach(function (o) {
+    pg.items.forEach(function (o) {
       var act = '';
-      if (o.hidden) act = rbtn('숨김 해제', 'ops-unhide', o.no);
+      if (o.hidden) act = rbtn('숨김해제', 'ops-unhide', o.no);
       else if (o.st === '완료' || o.st === '실패') act = rbtn('재처리', 'post-redo', o.no);
       h += '<div class="row">' + line('<span class="c-s">' + o.no + '</span><span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + '</span></span>') +
         '<span class="c-fill">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(0, 16)) + '</span>' +
         '<span class="c-act">' + act + '</span></div>';
     });
-    return shell('ops', 'admin', h + '</div>');
+    return shell('ops', 'admin', h + '</div>' + pager(pg, 'ops?r=admin&t=' + t));
   }
 
   /* ── 모달 ── */
@@ -397,7 +427,7 @@
         '<div class="inline">' + btn('취소', 'modal-close') + '<span class="grow"></span>' + btn('저장', 'term-save', '', 'btn-primary') + '</div>';
     }
     if (m.kind === 'confirm') {
-      body = '<div class="h2">탈퇴 처리</div><p>' + esc(m.text) + '</p><div class="inline">' + btn('취소', 'modal-close') + '<span class="grow"></span>' + btn('탈퇴', 'confirm-yes', '', 'btn-secondary is-danger') + '</div>';
+      body = '<div class="h2">' + esc(m.title) + '</div><p>' + esc(m.text) + '</p><div class="inline">' + btn('취소', 'modal-close') + '<span class="grow"></span>' + btn(m.yes, 'confirm-yes', '', 'btn-secondary is-danger') + '</div>';
     }
     return '<div class="modal-bg"><div class="modal stack">' + body + '</div></div>';
   }
@@ -425,8 +455,8 @@
   function setMember(id, st, why) {
     state.members.forEach(function (m) { if (m.id === +id) { m.st = st; if (why) m.why = why; } });
   }
-  function selectedIds() {
-    return Object.keys(state.sel).filter(function (k) { return state.sel[k]; }).map(Number);
+  function selectedIds(prefix) {
+    return Object.keys(state.sel).filter(function (k) { return k.charAt(0) === prefix && state.sel[k]; }).map(function (k) { return +k.slice(1); });
   }
 
   var ACT = {
@@ -479,19 +509,31 @@
     'modal-close': function () { state.modal = null; state.err = ''; render(); },
     'm-approve': function (el) { setMember(el.getAttribute('data-id'), 'ok'); render(); toast('승인했습니다'); },
     'm-reject': function (el) { setMember(el.getAttribute('data-id'), 'out', '거절'); render(); toast('거절했습니다'); },
-    withdraw: function (el) { state.modal = { kind: 'confirm', ids: [+el.getAttribute('data-id')], text: '선택한 1명을 탈퇴 처리합니다. 탈퇴한 멤버는 다시 가입 신청할 수 있습니다.' }; render(); },
+    withdraw: function (el) { state.modal = { kind: 'confirm', what: 'member', title: '탈퇴 처리', yes: '탈퇴', ids: [+el.getAttribute('data-id')], text: '선택한 1명을 탈퇴 처리합니다. 탈퇴한 멤버는 다시 가입 신청할 수 있습니다.' }; render(); },
     'withdraw-bulk': function () {
-      var ids = selectedIds();
-      state.modal = { kind: 'confirm', ids: ids, text: '선택한 ' + ids.length + '명을 탈퇴 처리합니다. 탈퇴한 멤버는 다시 가입 신청할 수 있습니다.' }; render();
+      var ids = selectedIds('m');
+      state.modal = { kind: 'confirm', what: 'member', title: '탈퇴 처리', yes: '탈퇴', ids: ids, text: '선택한 ' + ids.length + '명을 탈퇴 처리합니다. 탈퇴한 멤버는 다시 가입 신청할 수 있습니다.' }; render();
+    },
+    'gdel-bulk': function () {
+      var ids = selectedIds('g');
+      state.modal = { kind: 'confirm', what: 'term', title: '용어 삭제', yes: '삭제', ids: ids, text: '선택한 ' + ids.length + '건을 삭제합니다.' }; render();
     },
     'confirm-yes': function () {
-      state.modal.ids.forEach(function (id) { setMember(id, 'out', '탈퇴'); });
-      state.sel = {}; state.modal = null; render(); toast('탈퇴 처리했습니다');
+      var m = state.modal;
+      if (m.what === 'member') m.ids.forEach(function (id) { setMember(id, 'out', '탈퇴'); });
+      else state.gloss = state.gloss.filter(function (g) { return m.ids.indexOf(g.id) < 0; });
+      state.sel = {}; state.modal = null; render(); toast(m.what === 'member' ? '탈퇴 처리했습니다' : '삭제했습니다');
     },
     idle: function (el) { state.idle = +el.getAttribute('data-v'); state.sel = {}; render(); },
     'sel-all': function (el) {
-      var on = el.checked;
-      state.members.forEach(function (m) { if (m.st === 'ok' && daysAgo(m.seen) >= state.idle) state.sel[m.id] = on; });
+      var on = el.checked, q = parse().q;
+      var rows = state.members.filter(function (m) { return m.st === 'ok' && daysAgo(m.seen) >= state.idle; });
+      pageOf(rows, q).items.forEach(function (m) { state.sel['m' + m.id] = on; });
+      render();
+    },
+    'gsel-all': function (el) {
+      var on = el.checked, q = parse().q, admin = q.r === 'admin';
+      pageOf(state.gloss, q).items.forEach(function (g) { if (canEditTerm(g, admin)) state.sel['g' + g.id] = on; });
       render();
     }
   };
@@ -509,7 +551,8 @@
   });
   document.addEventListener('change', function (e) {
     var t = e.target;
-    if (t.getAttribute && t.getAttribute('data-act') === 'sel-all') { ACT['sel-all'](t); return; }
+    var an = t.getAttribute && t.getAttribute('data-act');
+    if (an === 'sel-all' || an === 'gsel-all') { ACT[an](t); return; }
     if (t.getAttribute && t.getAttribute('data-sel')) { state.sel[t.getAttribute('data-sel')] = t.checked; render(); }
   });
   document.addEventListener('input', function (e) {

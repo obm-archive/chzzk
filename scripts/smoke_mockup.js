@@ -40,18 +40,25 @@ setf('link','https://cafe.naver.com/a/1');click(byAct('signup'));settle();ok(txt
 // 틀: 헤더 · 왼쪽 메뉴 · 하단 바 · 서랍
 nav('home?r=user');ok(!!$('.header')&&!!$('.lnb')&&$$('.tabbar-item').length===4,'shell: header + lnb + 4-item tabbar');
 ok($$('.lnb .lnb-link').length===0||true,'lnb present');
-ok($$('.gallery .g-card').length===12,'home gallery 12 cards');
-ok($$('.g-img').length===12,'thumbnails rendered');
+ok($$('.gallery .g-card').length===5,'home gallery 5 cards per page');
+ok($$('.g-img').length===5,'thumbnails rendered');
 nav('home?r=user&cat=talk');ok($$('.g-card').length>0&&$$('.g-card').length<12,'category filter');
 click($$('[data-act="menu-open"]')[0]);ok(!!$('.drawer'),'hamburger opens drawer');click(byAct('menu-close'));ok(!$('.drawer'),'drawer closes');
 nav('home?r=user');ok(!txt().includes('멤버 관리'),'user: no admin menu');
 nav('home?r=admin');ok(txt().includes('멤버 관리')&&txt().includes('처리 현황'),'admin: extra menu in same screen');
 // 검색
 nav('search?r=user');ok($('[data-f="q"]').placeholder==='이 얘기 언제 했더라?'&&($('[data-f="from"]').compareDocumentPosition($('[data-f="q"]'))&4)!==0,'search: keyword below dates, no placeholder');ok(!!$('[data-f="from"]')&&!!$('[data-f="to"]')&&!!$('[data-f="cat"]'),'search: keyword + date range + category');
-setf('q','캠핑장');click(byAct('search'));settle();ok(txt().includes('검색 결과')&&$$('.g-card').length>0,'search hits as gallery');
+setf('q','캠핑장');click(byAct('search'));settle();ok(/전체 \d+건/.test(txt())&&$$('.g-card').length>0,'search hits as gallery');
 nav('search?r=user&q=없는검색어');ok(txt().includes('검색 결과가 없습니다'),'no result state');
 nav('search?r=user&from=2026-11-20&to=2026-11-26&cat=talk');const dn=$$('.g-card').length;ok(dn>0&&dn<12,'date+category filter ('+dn+')');
 nav('search?r=user&from=2030-01-01');ok(txt().includes('검색 결과가 없습니다'),'date filter excludes');
+// 목록 공통: 건수 줄 · 페이지 · 선택
+nav('home?r=user');ok(txt().includes('전체 12건')&&$$('.pager-btn').length===5,'home: total + pager (3 pages)');
+nav('home?r=user&p=3');ok($$('.g-card').length===2,'home: last page 2 cards');
+nav('glossary?r=user');ok(txt().includes('전체')&&txt().includes('선택 0건')&&!!byAct('gdel-bulk'),'glossary toolbar with 선택삭제');
+nav('members?r=admin&t=ok');ok(txt().includes('선택탈퇴')&&txt().includes('선택 0건'),'members ok toolbar 선택탈퇴');
+nav('ops?r=admin');ok(txt().includes('전체 ')&&!txt().includes('선택 0건'),'ops: total only');
+const ot=[...$$('.tabs .tab')].map(x=>x.textContent.trim()).join('/');ok(ot==='전체/처리필요/숨김','ops tab order/labels: '+ot);
 // 탭
 nav('login');ok($$('.tabs .tab').length===2&&$$('.tab.on').length===1,'login tabs are tabs');
 nav('members?r=admin&t=ok');ok($$('.tabs .tab').length===3,'members tabs');

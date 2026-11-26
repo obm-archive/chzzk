@@ -80,10 +80,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .btn:focus-visible,
 .chip:focus-visible,
 .tab:focus-visible,
+.pager-btn:focus-visible,
 .link:focus-visible,
 .lnb-link:focus-visible,
 .g-card:focus-visible,
 .row-link:focus-visible { outline: var(--bw) solid var(--c-link); outline-offset: var(--bw); }
+.pager { justify-content: center; margin-top: var(--sp-2); }
+.pager-btn { min-width: var(--h-control); height: var(--h-control); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-s); }
+.pager-btn:disabled { color: var(--c-text-mute); background: var(--c-fill); cursor: not-allowed; }
 .check { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-s); }
 
 /* ── 칩(태그 포함) ── */
@@ -161,6 +165,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
   .c-xs, .c-s, .c-m,   .c-act { width: 100%; }
   .m-grow { flex: 1; }
-  .c-act:empty, .c-fill:empty { display: none; }
+  .c-act:empty, .c-fill:empty, .c-xs:empty { display: none; }
   .c-hide { display: none; }
 }
