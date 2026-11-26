@@ -66,7 +66,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .btn-primary { background: var(--c-text); border-color: var(--c-text); color: var(--c-on-ink); }
 .btn-secondary { background: var(--c-surface); color: var(--c-text); }
 .btn:disabled { background: var(--c-fill); border-color: var(--c-line); color: var(--c-text-mute); cursor: not-allowed; }
-.btn-secondary:hover { border-color: var(--c-text); }
+.btn-primary:enabled:hover { background: var(--c-text-sub); border-color: var(--c-text-sub); }
+.btn-secondary:enabled:hover { border-color: var(--c-text); }
+.chip:enabled:hover { border-color: var(--c-text); color: var(--c-text); }
+.tab:hover { color: var(--c-text); }
+.pager-btn:enabled:hover { border-color: var(--c-text); }
+.menu-btn:hover,
+.tabbar-item:hover { background: var(--c-fill); }
 .fill { width: 100%; }
 
 /* ── 입력 ── */
@@ -98,7 +104,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .chip { display: inline-flex; white-space: nowrap; align-items: center; height: var(--h-chip); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-xs); color: var(--c-text-sub); }
 
 /* ── 카드 · 안내 · 인용 ── */
-.card { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); padding: var(--sp-4); }
+.card { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); padding: var(--sp-3); }
 .notice { padding: var(--sp-2) var(--sp-3); background: var(--c-fill); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-s); color: var(--c-text-sub); }
 .quote { padding: var(--sp-2) var(--sp-3); background: var(--c-fill); border-radius: var(--r-control); font-size: var(--fs-s); }
 
