@@ -1,0 +1,125 @@
+name: test-full
+# 방송 1건 전체 처리 테스트: 다운로드 -> 오디오 분할 -> Groq 전사(이어하기 가능) -> Gemini 구간 요약(+주요 대사)
+on:
+  workflow_dispatch:
+    inputs:
+      video_no:
+        description: "치지직 다시보기 번호"
+        required: true
+        default: "16365315"
+      budget_min:
+        description: "전사 단계에 쓸 최대 시간(분)"
+        required: true
+        default: "300"
+
+permissions:
+  contents: write
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      VIDEO_NO: ${{ inputs.video_no }}
+      GROQ_API: ${{ secrets.GROQ_API }}
+      GEMINI_API: ${{ secrets.GEMINI_API }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 도구 설치
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install --upgrade yt-dlp google-genai requests
+
+      - name: 이전 진행분 복원
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            work/chunks
+            work/tx
+            work/timing.json
+          key: full-${{ inputs.video_no }}-none
+          restore-keys: full-${{ inputs.video_no }}-
+
+      - name: 방송 정보 조회
+        run: |
+          mkdir -p work
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36"
+          curl -s -A "$UA" "https://api.chzzk.naver.com/service/v2/videos/$VIDEO_NO" > work/detail.json
+          python3 - <<'PY'
+          import json,os
+          c=json.load(open('work/detail.json',encoding='utf-8'))['content']
+          meta={"video_no":c["videoNo"],"title":c["videoTitle"],"category":c.get("videoCategoryValue"),
+                "start":c.get("liveOpenDate"),"publish":c.get("publishDate"),"duration":c["duration"],"adult":c.get("adult")}
+          json.dump(meta,open('work/meta.json','w',encoding='utf-8'),ensure_ascii=False)
+          print(meta)
+          open(os.environ['GITHUB_ENV'],'a').write("IS_ADULT=%s\n"%("true" if c.get("adult") else "false"))
+          PY
+
+      - name: 쿠키 준비 (성인 방송일 때만)
+        if: env.IS_ADULT == 'true'
+        env:
+          NID_AUT: ${{ secrets.NAVER_NID_AUT }}
+          NID_SES: ${{ secrets.NAVER_NID_SES }}
+        run: |
+          printf '# Netscape HTTP Cookie File\n.naver.com\tTRUE\t/\tTRUE\t0\tNID_AUT\t%s\n.naver.com\tTRUE\t/\tTRUE\t0\tNID_SES\t%s\n' "$NID_AUT" "$NID_SES" > cookies.txt
+          echo "COOKIE_ARGS=--cookies cookies.txt" >> $GITHUB_ENV
+
+      - name: 다운로드 (144p, 동시 16)
+        run: |
+          if [ -n "$(ls work/chunks/*.mp3 2>/dev/null)" ]; then echo "오디오 분할본이 이미 있어 건너뜀"; exit 0; fi
+          SECONDS=0
+          yt-dlp $COOKIE_ARGS --no-playlist -f "worst" --downloader m3u8:native -N 16 \
+            -o "work/vod.%(ext)s" "https://chzzk.naver.com/video/$VIDEO_NO"
+          D=$SECONDS
+          ls -lh work
+          SECONDS=0
+          mkdir -p work/chunks
+          ffmpeg -v error -i work/vod.* -vn -ac 1 -ar 16000 -b:a 48k \
+            -f segment -segment_time 600 -reset_timestamps 1 work/chunks/c_%03d.mp3
+          E=$SECONDS
+          rm -f work/vod.*
+          echo "{\"download_s\": $D, \"extract_s\": $E}" > work/timing.json
+          cat work/timing.json
+          ls work/chunks | wc -l; du -sh work/chunks
+
+      - name: 전사 (Groq, 이어하기)
+        run: |
+          python scripts/full_pipeline.py transcribe work/chunks work/tx work/status.json "${{ inputs.budget_min }}" glossary/terms.txt
+
+      - name: 진행분 저장
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            work/chunks
+            work/tx
+            work/timing.json
+          key: full-${{ inputs.video_no }}-${{ github.run_id }}
+
+      - name: 완료 여부 확인
+        id: st
+        run: |
+          python3 -c "import json;s=json.load(open('work/status.json'));print(s);open('$GITHUB_OUTPUT','a').write('complete=%s\n'%str(s['complete']).lower())"
+
+      - name: 요약 (Gemini, 30분 단위 + 병합)
+        if: steps.st.outputs.complete == 'true'
+        run: |
+          python3 - <<'PY'
+          import json,os
+          m=json.load(open('work/meta.json',encoding='utf-8'))
+          m["timing"]=json.load(open('work/timing.json')) if os.path.exists('work/timing.json') else {}
+          m["timing"].update({"transcribe_status":json.load(open('work/status.json'))})
+          json.dump(m,open('work/meta.json','w',encoding='utf-8'),ensure_ascii=False)
+          PY
+          python scripts/full_pipeline.py summarize work/tx "results/run-${{ github.run_number }}-full" work/meta.json glossary/terms.txt
+
+      - name: 결과 저장
+        if: steps.st.outputs.complete == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results
+          git commit -m "Add full-broadcast test results (run ${{ github.run_number }})"
+          git pull --rebase origin main
+          git push origin HEAD:main
