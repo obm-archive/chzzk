@@ -49,13 +49,27 @@ jobs:
           yt-dlp --no-playlist \
             -f "bv*[height<=480]+ba/b[height<=480]/worst" \
             --download-sections "*0-60" \
-            --downloader-args "ffmpeg_i:-allowed_extensions ALL" \
+            --downloader-args "ffmpeg_i:-allowed_extensions ALL -extension_picky 0" \
             -o "out/test.%(ext)s" \
             "$VOD_URL"
 
-      - name: Show result
+      - name: Alt test - native HLS downloader (no ffmpeg), 30 seconds max
+        if: always()
         run: |
-          ls -lh out
+          mkdir -p out
+          timeout 30 yt-dlp --no-playlist \
+            -f "bv*[height<=480]+ba/b[height<=480]/worst" \
+            --downloader m3u8:native \
+            -o "out/native.%(ext)s" \
+            "$VOD_URL" || true
+          echo "--- files after native test ---"
+          ls -lh out || true
+
+      - name: Show result
+        if: always()
+        run: |
+          ls -lh out || true
           for f in out/*; do
-            ffprobe -v error -show_entries format=duration,size -of default=nw=1 "$f"
+            echo "== $f"
+            ffprobe -v error -show_entries format=duration,size -of default=nw=1 "$f" || true
           done
