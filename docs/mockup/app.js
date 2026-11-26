@@ -269,20 +269,20 @@
     h += '<div class="inline"><span class="chip">' + esc(catLabel(p.cat)) + '</span><span class="small sub">' + esc(p.date.slice(0, 16)) + ' · ' + dur(p.dur) + '</span></div>';
     if (r === 'admin') h += '<div class="inline">' + btn('숨김', 'post-hide') + btn('재처리', 'post-redo') + '</div>';
     if (p.no !== DETAIL_NO) return shell('', r, h + '<div class="notice is-warn">아직 요약 처리 전인 방송입니다.</div>');
-    h += '<div class="media"><div class="stack"><div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div></div><div class="stack">';
     h += '<div class="list">' + LINKED.map(function (x) {
       return '<div class="row"><span class="c-s bold">' + esc(x.label) + '</span><span class="c-fill sub">' + dur(x.dur) +
         '</span><span class="c-b"><a class="link" href="https://chzzk.naver.com/video/' + x.no + '" target="_blank" rel="noopener">치지직에서 보기</a></span></div>';
     }).join('') + '</div>';
-    h += '<div class="card stack"><div class="h2">전체 요약</div><p>' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div></div></div>';
+    h += '<div class="media"><div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div>' +
+      '<div class="card stack"><div class="h2">전체 요약</div><p>' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div></div>';
     h += '<div class="h2">구간별 요약</div>';
     M.segments.forEach(function (s, i) {
-      h += '<div class="card media' + (focus === i ? ' hit' : '') + '"><div class="stack">' +
-        '<button class="link" data-act="seek" data-v="' + esc(s.start) + '">' + esc(s.start) + ' – ' + esc(s.end) + '</button><div class="cap"></div></div><div class="stack">' +
+      h += '<div class="card media' + (focus === i ? ' hit' : '') + '"><div class="cap">' +
+        '<button class="cap-time" data-act="seek" data-v="' + esc(s.start) + '">' + esc(s.start) + ' – ' + esc(s.end) + '</button></div><div class="stack">' +
+        '<div class="bold">' + esc(s.title) + '</div><p class="small sub">' + esc(s.summary) + '</p>' +
         s.quotes.map(function (x) {
           return '<div class="quote"><button class="link" data-act="seek" data-v="' + esc(x.time) + '">' + esc(x.time) + '</button> ' + esc(x.text) + '</div>';
         }).join('') +
-        '<div class="bold">' + esc(s.title) + '</div><p class="small sub">' + esc(s.summary) + '</p>' +
         '<div class="inline">' + chips(s.keywords) + '</div></div></div>';
     });
     return shell('', r, h);
