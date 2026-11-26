@@ -61,6 +61,9 @@ def transcribe_chunk(key, path, prompt):
             print(f"Groq {r.status_code} on {os.path.basename(path)}; waiting {wait:.0f}s")
             time.sleep(wait)
             continue
+        if r.status_code == 400 and "audio_too_short" in r.text:
+            print(f"{os.path.basename(path)} is too short; skipping.")
+            return {"segments": []}
         raise RuntimeError(f"Groq error {r.status_code}: {r.text[:300]}")
     raise RuntimeError("Groq: too many retries")
 
@@ -103,6 +106,9 @@ def main():
     segments = []
     t0 = time.time()
     for i, f in enumerate(files):
+        if os.path.getsize(f) < 2000:
+            print(f"{os.path.basename(f)} is tiny ({os.path.getsize(f)} bytes); skipping.")
+            continue
         offset = start_sec + i * chunk_sec
         res = transcribe_chunk(groq_key, f, prompt)
         for s in res.get("segments", []):

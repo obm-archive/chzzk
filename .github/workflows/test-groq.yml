@@ -43,11 +43,20 @@ jobs:
           sudo apt-get install -y -qq ffmpeg
           python -m pip install --upgrade yt-dlp google-genai requests
 
+      - name: Restore cached audio chunks
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: work/chunks
+          key: chunks-v1-${{ inputs.start_min }}-${{ inputs.minutes }}-${{ inputs.url }}
+
       - name: List available formats
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           yt-dlp --no-playlist -F "$VOD_URL" || true
 
       - name: Download clip (low quality)
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           START=$((START_MIN * 60))
           END=$(((START_MIN + MINUTES) * 60))
@@ -63,6 +72,7 @@ jobs:
           ls -lh work
 
       - name: Extract audio chunks
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           CLIP=$(ls work/clip.* | head -n 1)
           mkdir -p work/chunks
@@ -70,6 +80,13 @@ jobs:
             -f segment -segment_time "$CHUNK_SEC" -reset_timestamps 1 \
             work/chunks/c_%03d.mp3
           ls -lh work/chunks
+
+      - name: Save audio chunks to cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: work/chunks
+          key: chunks-v1-${{ inputs.start_min }}-${{ inputs.minutes }}-${{ inputs.url }}
 
       - name: Transcribe (Groq) and summarize (Gemini)
         run: |
