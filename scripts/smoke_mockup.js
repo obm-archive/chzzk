@@ -18,7 +18,7 @@ const settle=()=>{w.dispatchEvent(new w.HashChangeEvent('hashchange'));$$('[clas
 const setf=(k,v)=>{const e=$(`[data-f="${k}"]`);e.value=v;e.dispatchEvent(new w.Event('input',{bubbles:true}))};
 
 nav('');ok(txt().includes('화면 목록')&&!$('.title').textContent.includes('치지직로그'),'index is 화면 목록, not login');
-ok($$('[data-go]').length>=24,'index lists screen links ('+$$('[data-go]').length+')');
+ok($$('[data-go]').length>=23,'index lists screen links ('+$$('[data-go]').length+')');
 ok(d.title==='치지직로그','document title = service name');
 // 모든 목록 링크를 열어 오류 없이 그려지는지
 const links=$$('[data-go]').map(e=>e.getAttribute('data-go'));
@@ -56,7 +56,6 @@ nav('search?r=user&from=2030-01-01');ok(txt().includes('검색 결과가 없습�
 nav('login');ok($$('.tabs .tab').length===2&&$$('.tab.on').length===1,'login tabs are tabs');
 nav('members?r=admin&t=ok');ok($$('.tabs .tab').length===3,'members tabs');
 nav('me?r=user');ok(txt().includes('내 정보')&&txt().includes('로그아웃'),'me screen');
-nav('post?r=user&no=16268684');ok(txt().includes('요약 처리 전'),'unprocessed post notice');
 // 상세
 nav('post?r=user&seg=2');ok($$('.card.media').length>0&&!$('.aside'),'detail: media layout per segment');ok(!!$('.hit'),'focus exists');ok($$('.card.hit').length===1,'one focused segment');ok(!txt().includes('재처리'),'user detail: no admin buttons');
 click(byAct('seek'));ok(!!$('#toast'),'timestamp toast');
@@ -77,7 +76,9 @@ click(byAct('sel-all'));const c=$('[data-act="sel-all"]');c.checked=true;c.dispa
 ok(!byAct('withdraw-bulk').disabled,'bulk withdraw enabled after select');
 click(byAct('withdraw-bulk'));click(byAct('confirm-yes'));ok(!$('.modal')&&$$('[data-act="withdraw"]').length===0,'bulk withdraw done');
 nav('members?r=admin&t=out');ok(txt().includes('탈퇴')&&txt().includes('거절'),'out tab shows withdrawn/rejected');
-nav('ops?r=admin');ok(!$('progress')&&txt().includes('처리 중 60%')&&$$('.chip.is-danger').length===1,'ops: percent chip + failed chip');
+nav('ops?r=admin&t=all');ok(['대기','처리중','완료','실패'].every(s=>txt().includes(s))&&!txt().includes('병합')&&$$('.chip.is-danger').length===1,'ops: 4 statuses, no merge/split');
+nav('ops?r=admin&t=todo');ok(!txt().includes('완료'),'ops todo tab hides completed');
+nav('ops?r=admin&t=hidden');ok($$('[data-act="ops-unhide"]').length===1,'hidden tab lists 1');click(byAct('ops-unhide'));ok(txt().includes('해당하는 방송이 없습니다'),'unhide removes from hidden tab');
 // 미정의 클래스
 const undef=[...used].filter(c=>!defined.has(c));
 ok(undef.length===0,'all DOM classes defined in CSS '+(undef.length?JSON.stringify(undef):''));

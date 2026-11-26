@@ -50,11 +50,10 @@
   --h-row: 64px;
   --icon: 20px;
 
-  /* 목록 열 너비 프리셋: xs·s·m·l 고정, fill 자율 */
+  /* 목록 열 너비 프리셋: xs·s·m 고정, fill 자율 */
   --col-xs: 56px;
   --col-s: 112px;
   --col-m: 160px;
-  --col-l: 176px;
 
   /* 레이아웃 */
   --w-lnb: 220px;

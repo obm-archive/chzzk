@@ -37,7 +37,7 @@
     { no: 3, name: '검색', items: [
       ['기본', 'search?r=user'], ['검색 결과', 'search?r=user&q=캠핑장'], ['결과 없음', 'search?r=user&q=없는검색어'],
       ['기간·카테고리', 'search?r=user&from=2026-11-20&to=2026-11-26&cat=talk']] },
-    { no: 4, name: '방송 상세', items: [['요약 완료 · 사용자', 'post?r=user'], ['요약 완료 · 관리자', 'post?r=admin'], ['처리 전', 'post?r=user&no=' + M.posts[1].no]] },
+    { no: 4, name: '방송 상세', items: [['요약 완료 · 사용자', 'post?r=user'], ['요약 완료 · 관리자', 'post?r=admin']] },
     { no: 5, name: '용어집', items: [['사용자', 'glossary?r=user'], ['관리자', 'glossary?r=admin']] },
     { no: 6, name: '내 정보', items: [['사용자', 'me?r=user'], ['관리자', 'me?r=admin']] },
     { no: 7, name: '멤버 관리', items: [['가입 대기', 'members?r=admin&t=pending'], ['승인됨', 'members?r=admin&t=ok'], ['탈퇴·거절', 'members?r=admin&t=out']] },
@@ -69,9 +69,11 @@
       { id: 11, nick: '신청자00', st: 'out', joined: '2026-11-01', seen: '', why: '거절' }
     ],
     ops: [
-      { no: 16365315, title: M.post.title, at: M.post.start, st: '완료', cls: '', pct: 100 },
-      { no: 16372104, title: '처리 중인 방송 예시', at: '2026-11-26 19:00:12', st: '처리 중', cls: 'is-info', pct: 60 },
-      { no: 16358201, title: '실패한 방송 예시', at: '2026-11-23 20:10:40', st: '실패', cls: 'is-danger', pct: 0 }
+      { no: 16372880, title: '대기 중인 방송 예시', at: '2026-11-26 21:30:05', st: '대기', cls: '', hidden: false },
+      { no: 16372104, title: '처리중인 방송 예시', at: '2026-11-26 19:00:12', st: '처리중', cls: 'is-info', hidden: false },
+      { no: 16358201, title: '실패한 방송 예시', at: '2026-11-23 20:10:40', st: '실패', cls: 'is-danger', hidden: false },
+      { no: 16365315, title: M.post.title, at: M.post.start, st: '완료', cls: '', hidden: false },
+      { no: 16301177, title: '숨김 처리한 방송 예시', at: '2026-11-10 20:00:00', st: '완료', cls: '', hidden: true }
     ]
   };
 
@@ -273,7 +275,6 @@
       (r === 'admin' ? btn('숨김', 'post-hide') + btn('재처리', 'post-redo') : '') + '</div>';
     h += '<h1 class="title">' + esc(p.title) + '</h1>';
     h += '<div class="inline"><span class="chip">' + esc(catLabel(p.cat)) + '</span><span class="small sub">' + esc(p.date.slice(0, 16)) + ' · ' + dur(p.dur) + '</span></div>';
-    if (p.no !== DETAIL_NO) return shell('', r, h + '<div class="notice is-warn">아직 요약 처리 전인 방송입니다.</div>');
     h += '<div class="media md-col"><div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div>' +
       '<div class="card stack"><div class="h2">전체 요약</div><p>' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div></div>';
     h += '<div class="h2">연결된 방송</div><div class="list">' + LINKED.map(function (x) {
@@ -360,13 +361,24 @@
     });
     return shell('members', 'admin', h + '</div>');
   }
-  function vOps() {
+  function vOps(q) {
+    var t = q.t || 'todo';
     var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">네이버 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
+    h += tabs([['todo', '처리 필요', 'ops?r=admin&t=todo'], ['all', '전체', 'ops?r=admin&t=all'], ['hidden', '숨김', 'ops?r=admin&t=hidden']], t);
+    var list = state.ops.filter(function (o) {
+      if (t === 'hidden') return o.hidden;
+      if (o.hidden) return false;
+      return t === 'all' || o.st !== '완료';
+    });
     h += '<div class="list"><div class="row row-head"><span class="c-s">방송 번호</span><span class="c-s">상태</span><span class="c-fill">제목</span><span class="c-m c-hide">시작</span><span class="c-act">관리</span></div>';
-    state.ops.forEach(function (o) {
-      h += '<div class="row">' + line('<span class="c-s">' + o.no + '</span><span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + (o.st === '처리 중' ? ' ' + o.pct + '%' : '') + '</span></span>') +
+    if (!list.length) h += '<div class="row mute">해당하는 방송이 없습니다.</div>';
+    list.forEach(function (o) {
+      var act = '';
+      if (o.hidden) act = rbtn('숨김 해제', 'ops-unhide', o.no);
+      else if (o.st === '완료' || o.st === '실패') act = rbtn('재처리', 'post-redo', o.no);
+      h += '<div class="row">' + line('<span class="c-s">' + o.no + '</span><span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + '</span></span>') +
         '<span class="c-fill">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(0, 16)) + '</span>' +
-        '<span class="c-act">' + rbtn('재처리', 'post-redo', o.no) + rbtn('병합·분할', 'post-split', o.no) + '</span></div>';
+        '<span class="c-act">' + act + '</span></div>';
     });
     return shell('ops', 'admin', h + '</div>');
   }
@@ -437,7 +449,11 @@
     seek: function (el) { toast(el.getAttribute('data-v') + ' 시점으로 이동'); },
     'post-hide': function () { toast('숨김 처리했습니다'); },
     'post-redo': function () { toast('재처리를 요청했습니다'); },
-    'post-split': function () { toast('병합·분할 화면으로 이동'); },
+    'ops-unhide': function (el) {
+      var no = +el.getAttribute('data-id');
+      state.ops.forEach(function (o) { if (o.no === no) o.hidden = false; });
+      render(); toast('숨김을 해제했습니다');
+    },
     'term-add': function () { state.form.tname = ''; state.form.ttype = TERM_TYPES[0]; state.form.tdesc = ''; state.err = ''; state.modal = { kind: 'term', id: 0 }; render(); },
     'term-edit': function (el) {
       var g = findG(el.getAttribute('data-id'));
