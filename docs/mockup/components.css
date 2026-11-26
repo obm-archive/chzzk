@@ -27,8 +27,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .mute { color: var(--c-text-mute); }
 .link { background: none; border: 0; color: var(--c-link); cursor: pointer; padding: 0; text-decoration: none; }
 .link:hover { text-decoration: underline; }
-.link-danger { background: none; border: 0; color: var(--c-danger); cursor: pointer; padding: 0; }
-.link-danger:hover { text-decoration: underline; }
 .icon { flex: none; width: var(--icon); height: var(--icon); }
 
 /* ── 배치 ── */
@@ -83,7 +81,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .chip:focus-visible,
 .tab:focus-visible,
 .link:focus-visible,
-.link-danger:focus-visible,
 .lnb-link:focus-visible,
 .g-card:focus-visible,
 .row-link:focus-visible { outline: var(--bw) solid var(--c-link); outline-offset: var(--bw); }
@@ -98,7 +95,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .quote { padding: var(--sp-2) var(--sp-3); background: var(--c-fill); border-radius: var(--r-control); font-size: var(--fs-s); }
 
 /* ── 갤러리 ── */
-.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--w-card), 1fr)); gap: var(--sp-3); }
+.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
 .g-card { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3); background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); text-align: left; cursor: pointer; }
 .g-card:hover { border-color: var(--c-text); }
 .g-thumb { flex: none; width: var(--w-thumb); aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
@@ -120,7 +117,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .c-m { flex: none; width: var(--col-m); }
 .c-l { flex: none; width: var(--col-l); }
 .c-b { flex: none; width: var(--col-b); }
-.c-act { flex: none; width: var(--col-l); display: flex; align-items: center; gap: var(--sp-3); }
+.c-act { flex: none; width: var(--col-l); display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-2); }
 .c-fill { flex: 1; min-width: 0; }
 .line { display: contents; }
 .m-label { display: none; }
@@ -130,10 +127,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .modal-bg { position: fixed; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--c-overlay); }
 .modal { width: 100%; max-width: var(--w-modal); padding: var(--sp-4); background: var(--c-surface); border-radius: var(--r-card); box-shadow: var(--shadow-dialog); }
 .toast { position: fixed; bottom: var(--sp-4); left: 50%; transform: translateX(-50%); z-index: 4; padding: var(--sp-2) var(--sp-3); background: var(--c-text); color: var(--c-on-ink); border-radius: var(--r-control); font-size: var(--fs-s); }
-.progress { width: 100%; min-width: var(--col-s); height: var(--sp-1); appearance: none; border: 0; border-radius: var(--r-control); background: var(--c-fill); overflow: hidden; }
-.progress::-webkit-progress-bar { background: var(--c-fill); }
-.progress::-webkit-progress-value { background: var(--c-text); }
-.progress::-moz-progress-bar { background: var(--c-text); }
 
 /* ── 상태 (칩·안내·버튼 공통) ── */
 .is-info { color: var(--c-info); background: var(--c-info-bg); border-color: var(--c-info); }
@@ -163,8 +156,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .line { display: flex; align-items: center; gap: var(--sp-3); }
   .m-end { margin-left: auto; }
   .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
-  .c-xs, .c-s, .c-m, .c-b, .c-l, .c-act { width: auto; }
-  .c-act { gap: var(--sp-4); }
+  .c-xs, .c-s, .c-m, .c-b, .c-l { width: auto; }
+  .c-act { width: 100%; }
+  .m-grow { flex: 1; }
   .c-act:empty, .c-fill:empty { display: none; }
   .clip { white-space: normal; }
 }
