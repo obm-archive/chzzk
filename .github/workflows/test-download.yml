@@ -49,6 +49,7 @@ jobs:
           yt-dlp --no-playlist \
             -f "bv*[height<=480]+ba/b[height<=480]/worst" \
             --download-sections "*0-60" \
+            --downloader-args "ffmpeg_i:-allowed_extensions ALL" \
             -o "out/test.%(ext)s" \
             "$VOD_URL"
 
