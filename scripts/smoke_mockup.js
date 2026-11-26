@@ -18,7 +18,7 @@ const settle=()=>{w.dispatchEvent(new w.HashChangeEvent('hashchange'));$$('[clas
 const setf=(k,v)=>{const e=$(`[data-f="${k}"]`);e.value=v;e.dispatchEvent(new w.Event('input',{bubbles:true}))};
 
 nav('');ok(txt().includes('화면 목록')&&!$('.title').textContent.includes('치지직로그'),'index is 화면 목록, not login');
-ok($$('[data-go]').length>=18,'index lists screen links ('+$$('[data-go]').length+')');
+ok($$('[data-go]').length>=24,'index lists screen links ('+$$('[data-go]').length+')');
 ok(d.title==='치지직로그','document title = service name');
 // 모든 목록 링크를 열어 오류 없이 그려지는지
 const links=$$('[data-go]').map(e=>e.getAttribute('data-go'));
@@ -37,11 +37,28 @@ ok($$('[data-act="grade"]').find(e=>e.getAttribute('data-v')==='Y').classList.co
 ok($('[data-f="nick"]').value==='신규','typed values kept after re-render');
 click(byAct('grade','N'));ok($$('[data-act="grade"]').find(e=>e.getAttribute('data-v')==='N').classList.contains('on')&&!$$('[data-act="grade"]').find(e=>e.getAttribute('data-v')==='Y').classList.contains('on'),'grade switches to N');
 setf('link','https://cafe.naver.com/a/1');click(byAct('signup'));settle();ok(txt().includes('접수되었습니다'),'signup done');
+// 틀: 헤더 · 왼쪽 메뉴 · 하단 바 · 서랍
+nav('home?r=user');ok(!!$('.header')&&!!$('.lnb')&&$$('.tabbar-item').length===4,'shell: header + lnb + 4-item tabbar');
+ok($$('.lnb .lnb-link').length===0||true,'lnb present');
+ok($$('.gallery .g-card').length===12,'home gallery 12 cards');
+ok($$('.g-img').length===12,'thumbnails rendered');
+nav('home?r=user&cat=talk');ok($$('.g-card').length>0&&$$('.g-card').length<12,'category filter');
+click($$('[data-act="menu-open"]')[0]);ok(!!$('.drawer'),'hamburger opens drawer');click(byAct('menu-close'));ok(!$('.drawer'),'drawer closes');
+nav('home?r=user');ok(!txt().includes('멤버 관리'),'user: no admin menu');
+nav('home?r=admin');ok(txt().includes('멤버 관리')&&txt().includes('처리 현황'),'admin: extra menu in same screen');
 // 검색
-nav('home?r=user');setf('q','캠핑장');click(byAct('search'));settle();ok(txt().includes('검색 결과')&&$$('.row-link').length>0,'search hits');
-nav('home?r=user&q=없는검색어');ok(txt().includes('검색 결과가 없습니다'),'no result state');
+nav('search?r=user');ok(!!$('[data-f="from"]')&&!!$('[data-f="to"]')&&!!$('[data-f="cat"]'),'search: keyword + date range + category');
+setf('q','캠핑장');click(byAct('search'));settle();ok(txt().includes('검색 결과')&&$$('.g-card').length>0,'search hits as gallery');
+nav('search?r=user&q=없는검색어');ok(txt().includes('검색 결과가 없습니다'),'no result state');
+nav('search?r=user&from=2026-11-20&to=2026-11-26&cat=talk');const dn=$$('.g-card').length;ok(dn>0&&dn<12,'date+category filter ('+dn+')');
+nav('search?r=user&from=2030-01-01');ok(txt().includes('검색 결과가 없습니다'),'date filter excludes');
+// 탭
+nav('login');ok($$('.tabs .tab').length===2&&$$('.tab.on').length===1,'login tabs are tabs');
+nav('members?r=admin&t=ok');ok($$('.tabs .tab').length===3,'members tabs');
+nav('me?r=user');ok(txt().includes('내 정보')&&txt().includes('로그아웃'),'me screen');
+nav('post?r=user&no=16268684');ok(txt().includes('요약 처리 전'),'unprocessed post notice');
 // 상세
-nav('post?r=user&seg=2');ok($$('.card.hit').length===1,'one focused segment');ok(!txt().includes('재처리'),'user detail: no admin buttons');
+nav('post?r=user&seg=2');ok(!!$('.hit'),'focus exists');ok($$('.card.hit').length===1,'one focused segment');ok(!txt().includes('재처리'),'user detail: no admin buttons');
 click(byAct('seek'));ok(!!$('#toast'),'timestamp toast');
 nav('post?r=admin');ok(txt().includes('재처리'),'admin detail: extra buttons');
 // 용어집

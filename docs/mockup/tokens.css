@@ -40,9 +40,10 @@
   --sp-5: 32px;
 
   /* 모서리 2종, 선 1종 */
-  --r-control: 6px;
-  --r-card: 12px;
+  --r-control: 2px;
+  --r-card: 4px;
   --bw: 1px;
+  --bw-tab: 2px;
 
   /* 컨트롤 높이, 아이콘 크기 */
   --h-control: 40px;
@@ -57,11 +58,14 @@
   --col-b: 96px;
 
   /* 레이아웃 */
-  --w-page: 960px;
+  --w-main: 1440px;
+  --w-lnb: 220px;
+  --w-card: 260px;
   --w-form: 360px;
   --w-modal: 440px;
   --bp-mobile: 640px;
-  --h-nav: 56px;
+  --h-header: 56px;
+  --h-tabbar: 64px;
 
   /* 그림자는 모달에만 */
   --shadow-dialog: 0 8px 32px rgba(0, 0, 0, 0.16);
