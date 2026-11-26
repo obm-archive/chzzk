@@ -36,7 +36,7 @@ setf('nick','신규');setf('pw','z');click(byAct('grade','Y'));
 ok($$('[data-act="grade"]').find(e=>e.getAttribute('data-v')==='Y').classList.contains('on'),'grade Y becomes selected');
 ok($('[data-f="nick"]').value==='신규','typed values kept after re-render');
 click(byAct('grade','N'));ok($$('[data-act="grade"]').find(e=>e.getAttribute('data-v')==='N').classList.contains('on')&&!$$('[data-act="grade"]').find(e=>e.getAttribute('data-v')==='Y').classList.contains('on'),'grade switches to N');
-setf('link','https://cafe.naver.com/a/1');click(byAct('signup'));settle();ok(txt().includes('접수되었습니다'),'signup done');
+setf('link','https://cafe.naver.com/a/1');click(byAct('signup'));ok(txt().includes('비밀번호가 올바르지 않습니다'),'signup: wrong common password blocked');setf('pw','1234');setf('nick','회원01');click(byAct('signup'));ok(txt().includes('이미 사용 중인 닉네임'),'signup: duplicate nickname blocked');setf('nick','신규');click(byAct('signup'));settle();ok(txt().includes('접수되었습니다'),'signup done');
 // 틀: 헤더 · 왼쪽 메뉴 · 하단 바 · 서랍
 nav('home?r=user');ok(!!$('.header')&&!!$('.lnb')&&$$('.tabbar-item').length===4,'shell: header + lnb + 4-item tabbar');
 ok($$('.lnb .lnb-link').length===0||true,'lnb present');

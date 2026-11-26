@@ -5,6 +5,7 @@
   var SERVICE = '치지직로그';
   var TODAY = '2026-11-26';
   var PAGE_SIZE = 10;
+  var MOCK_PW = '1234'; // 목업 전용 공통 비밀번호(실서비스는 서버 설정값)
   var CATEGORY = { talk: '토크' };
   var M = window.MOCK;
   var TERM_TYPES = ['닉네임', '밈·유행어', '인물', '게임 용어', '기타'];
@@ -467,6 +468,9 @@
     signup: function () {
       var f = state.form;
       if (!f.nick || !f.pw || !f.grade || !f.link) { state.err = '모든 항목을 입력해 주세요.'; render(); return; }
+      if (f.pw !== MOCK_PW) { state.err = '비밀번호가 올바르지 않습니다.'; render(); return; }
+      var dup = state.members.some(function (m) { return m.nick === f.nick && (m.st === 'pending' || m.st === 'ok'); });
+      if (dup) { state.err = '이미 사용 중인 닉네임입니다.'; render(); return; }
       state.err = '';
       go('login?tab=signup&s=done');
     },
