@@ -1,0 +1,153 @@
+{
+ "audio_seconds": 24937,
+ "vod_seconds": 24936,
+ "transcript_lines": 6898,
+ "dedupe_removed": 66,
+ "segments": 62,
+ "quotes": 88,
+ "quotes_verified": 88,
+ "segments_without_quote": 0,
+ "gemini_tokens": {
+  "prompt": 150369,
+  "output": 26116,
+  "thoughts": 2213
+ },
+ "cost_estimate_krw": {
+  "gemini": 307,
+  "groq": 388,
+  "total": 695
+ },
+ "windows": [
+  {
+   "window": "00:00:00~00:30:00",
+   "lines": 563,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 11773,
+   "output": 1263,
+   "segments": 3
+  },
+  {
+   "window": "00:30:00~01:00:00",
+   "lines": 541,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 11290,
+   "output": 1633,
+   "segments": 4
+  },
+  {
+   "window": "01:00:00~01:30:00",
+   "lines": 539,
+   "model": "gemini-3.8-flash",
+   "prompt": 11024,
+   "output": 1773,
+   "segments": 4
+  },
+  {
+   "window": "01:30:00~02:00:00",
+   "lines": 637,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 12423,
+   "output": 1960,
+   "segments": 4
+  },
+  {
+   "window": "02:00:00~02:30:00",
+   "lines": 524,
+   "model": "gemini-3.8-flash",
+   "prompt": 10453,
+   "output": 2375,
+   "segments": 6
+  },
+  {
+   "window": "02:30:00~03:00:00",
+   "lines": 524,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 10593,
+   "output": 2203,
+   "segments": 6
+  },
+  {
+   "window": "03:00:00~03:30:00",
+   "lines": 509,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 10637,
+   "output": 1357,
+   "segments": 3
+  },
+  {
+   "window": "03:30:00~04:00:00",
+   "lines": 402,
+   "model": "gemini-3.8-flash",
+   "prompt": 9040,
+   "output": 2013,
+   "segments": 5
+  },
+  {
+   "window": "04:00:00~04:30:00",
+   "lines": 408,
+   "model": "gemini-3.8-flash",
+   "prompt": 8395,
+   "output": 1843,
+   "segments": 5
+  },
+  {
+   "window": "04:30:00~05:00:00",
+   "lines": 466,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 9656,
+   "output": 1531,
+   "segments": 4
+  },
+  {
+   "window": "05:00:00~05:30:00",
+   "lines": 504,
+   "model": "gemini-3.5-flash",
+   "prompt": 10150,
+   "output": 2500,
+   "segments": 6
+  },
+  {
+   "window": "05:30:00~06:00:00",
+   "lines": 516,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 10894,
+   "output": 1349,
+   "segments": 4
+  },
+  {
+   "window": "06:00:00~06:30:00",
+   "lines": 435,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 9603,
+   "output": 1828,
+   "segments": 4
+  },
+  {
+   "window": "06:30:00~06:55:37",
+   "lines": 330,
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 7237,
+   "output": 1637,
+   "segments": 4
+  },
+  {
+   "window": "merge",
+   "model": "gemini-3.5-flash-lite",
+   "prompt": 7201,
+   "output": 851
+  }
+ ],
+ "timing": {
+  "download_s": 660,
+  "extract_s": 71,
+  "transcribe_status": {
+   "complete": true,
+   "done": 42,
+   "total": 42,
+   "audio_seconds": 24937.1,
+   "groq_wall_seconds_this_run": 115,
+   "waited_seconds_this_run": 56,
+   "wait_events": 7
+  }
+ }
+}
