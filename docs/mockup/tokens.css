@@ -59,10 +59,10 @@
 
   /* 레이아웃 */
   --w-lnb: 220px;
-  --w-card: 260px;
+  --w-card: 440px;
   --w-auth: 480px;
   --w-cap: 400px;
-  --w-thumb: 160px;
+  --w-thumb: 168px;
   --w-modal: 440px;
   --bp-mobile: 640px;
   --h-header: 56px;

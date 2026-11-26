@@ -99,13 +99,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ── 갤러리 ── */
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--w-card), 1fr)); gap: var(--sp-3); }
-.g-card { display: flex; flex-direction: column; background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); overflow: hidden; text-align: left; padding: 0; cursor: pointer; }
+.g-card { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3); background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); text-align: left; cursor: pointer; }
 .g-card:hover { border-color: var(--c-text); }
-.g-thumb { aspect-ratio: 16 / 9; background: var(--c-fill); }
+.g-thumb { flex: none; width: var(--w-thumb); aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
 .cap { position: relative; width: 100%; max-width: var(--w-cap); aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
 .cap-time { position: absolute; top: var(--sp-2); left: var(--sp-2); padding: 0 var(--sp-2); background: var(--c-overlay); border: 0; border-radius: var(--r-control); color: var(--c-on-ink); font-size: var(--fs-xs); line-height: var(--sp-4); cursor: pointer; }
 .g-img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.g-body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); padding: var(--sp-3); }
+.g-body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
 .g-title { font-weight: var(--fw-bold); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* ── 목록 ── */
@@ -122,6 +122,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .c-b { flex: none; width: var(--col-b); }
 .c-act { flex: none; width: var(--col-l); display: flex; align-items: center; gap: var(--sp-3); }
 .c-fill { flex: 1; min-width: 0; }
+.line { display: contents; }
+.m-label { display: none; }
 .clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── 모달 · 토스트 · 진행 막대 ── */
@@ -152,21 +154,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .media { grid-template-columns: 1fr; gap: var(--sp-3); }
   .card { padding: var(--sp-3) 0; background: transparent; border: 0; border-bottom: var(--bw) solid var(--c-line); border-radius: 0; }
   .list { background: transparent; border: 0; border-radius: 0; }
-  .row { padding-left: 0; padding-right: 0; }
   .auth-box { padding: var(--sp-3); border: 0; background: transparent; }
-  .row { flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
-  .c-xs { width: auto; }
-  .c-s, .c-b, .c-l { width: auto; order: 1; }
-  .c-m { flex: 1; width: auto; }
-  .c-act { width: auto; }
-  .c-fill { order: 1; flex-basis: 100%; }
-  .c-fill:empty { display: none; }
-  .c-act:empty { display: none; }
-  .clip { white-space: normal; }
-  .row-head { display: none; }
   .gallery { grid-template-columns: 1fr; gap: 0; }
-  .g-card { flex-direction: row; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 0; background: transparent; border: 0; border-bottom: var(--bw) solid var(--c-line); border-radius: 0; }
+  .g-card { padding: var(--sp-3) 0; background: transparent; border: 0; border-bottom: var(--bw) solid var(--c-line); border-radius: 0; }
   .g-card:hover { border-color: var(--c-line); }
-  .g-thumb { flex: none; width: var(--w-thumb); border-radius: var(--r-control); overflow: hidden; }
-  .g-body { flex: 1; min-width: 0; padding: 0; }
+  .row { flex-direction: column; align-items: stretch; gap: var(--sp-2); padding: var(--sp-3) 0; }
+  .row-head { display: none; }
+  .line { display: flex; align-items: center; gap: var(--sp-3); }
+  .m-end { margin-left: auto; }
+  .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
+  .c-xs, .c-s, .c-m, .c-b, .c-l, .c-act { width: auto; }
+  .c-act { gap: var(--sp-4); }
+  .c-act:empty, .c-fill:empty { display: none; }
+  .clip { white-space: normal; }
 }
