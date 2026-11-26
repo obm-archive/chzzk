@@ -1,54 +1,55 @@
-/* ==========================================================================
-   tokens.css — 디자인 기준값의 유일한 정의 위치
-   색, 글자, 간격, 모서리, 크기, 컬럼 폭은 모두 여기서만 정의한다.
-   components.css와 화면 코드는 var(--...)로만 가져다 쓴다 (원시 값 사용 금지).
-   ========================================================================== */
+/* 기준값 전용 파일. 색·크기·간격·모서리·선·그림자는 여기에서만 정의한다. */
 :root {
-  /* 색: 배경 3 / 글자 2 / 강조 1 / 선 1 / 상태 3 */
-  --c-bg: #121212;
-  --c-surface: #181818;
-  --c-raised: #1f1f1f;
-  --c-text: #ffffff;
-  --c-text-sub: #b3b3b3;
-  --c-accent: #1ed760;
-  --c-on-accent: #000000;
-  --c-line: #4d4d4d;
-  --c-danger: #f3727f;
-  --c-warn: #ffa42b;
-  --c-info: #539df5;
-  --c-overlay: rgba(0, 0, 0, 0.7);
+  /* 색 */
+  --c-bg: #fafafa;
+  --c-surface: #ffffff;
+  --c-fill: #f2f2f2;
+  --c-line: #ebebeb;
+  --c-line-strong: #d4d4d4;
+  --c-text: #171717;
+  --c-text-sub: #4d4d4d;
+  --c-text-mute: #8f8f8f;
+  --c-on-ink: #ffffff;
+  --c-link: #0070f3;
+  --c-info: #0761d1;
+  --c-info-bg: #eaf3ff;
+  --c-warn: #ab570a;
+  --c-warn-bg: #fff6e5;
+  --c-danger: #c50000;
+  --c-danger-bg: #fdecec;
+  --c-overlay: rgba(0, 0, 0, 0.4);
 
-  /* 글자: 크기 5 / 굵기 2 / 줄 간격 2 */
-  --font: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --fs-1: 12px;
-  --fs-2: 14px;
-  --fs-3: 16px;
-  --fs-4: 20px;
-  --fs-5: 24px;
-  --fw-regular: 400;
-  --fw-bold: 700;
-  --lh-title: 1.3;
-  --lh-body: 1.6;
+  /* 글꼴 */
+  --font: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  --fw-normal: 400;
+  --fw-bold: 600;
+
+  /* 글자 크기 5단계 */
+  --fs-xs: 12px;
+  --fs-s: 14px;
+  --fs-m: 16px;
+  --fs-l: 20px;
+  --fs-xl: 24px;
+  --lh: 1.6;
 
   /* 간격 5단계 */
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 16px;
-  --s-4: 24px;
-  --s-5: 32px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 16px;
+  --sp-4: 24px;
+  --sp-5: 32px;
 
-  /* 모서리 3종 */
-  --r-card: 8px;
-  --r-pill: 9999px;
-  --r-circle: 50%;
+  /* 모서리 2종, 선 1종 */
+  --r-control: 6px;
+  --r-card: 12px;
+  --bw: 1px;
 
-  /* 선 굵기, 컨트롤 높이 2종, 아이콘 */
-  --line-w: 1px;
-  --h-1: 28px;
-  --h-2: 40px;
+  /* 컨트롤 높이, 아이콘 크기 */
+  --h-control: 40px;
+  --h-row: 48px;
   --icon: 20px;
 
-  /* 목록 컬럼 폭 프리셋 (제목·내용 칸은 남는 폭을 차지) */
+  /* 목록 열 너비 6종 */
   --col-xs: 48px;
   --col-s: 80px;
   --col-m: 120px;
@@ -56,12 +57,12 @@
   --col-b: 96px;
 
   /* 레이아웃 */
-  --container: 960px;
-  --nav-w: 240px;
-  --nav-h: 64px;
-  --modal-w: 480px;
+  --w-page: 960px;
+  --w-form: 360px;
+  --w-modal: 440px;
+  --bp-mobile: 640px;
+  --h-nav: 56px;
 
-  /* 그림자 2종 */
-  --shadow-card: 0 8px 8px rgba(0, 0, 0, 0.3);
-  --shadow-dialog: 0 8px 24px rgba(0, 0, 0, 0.5);
+  /* 그림자는 모달에만 */
+  --shadow-dialog: 0 8px 32px rgba(0, 0, 0, 0.16);
 }
