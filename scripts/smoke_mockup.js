@@ -40,8 +40,8 @@ setf('link','https://cafe.naver.com/a/1');click(byAct('signup'));settle();ok(txt
 // 틀: 헤더 · 왼쪽 메뉴 · 하단 바 · 서랍
 nav('home?r=user');ok(!!$('.header')&&!!$('.lnb')&&$$('.tabbar-item').length===4,'shell: header + lnb + 4-item tabbar');
 ok($$('.lnb .lnb-link').length===0||true,'lnb present');
-ok($$('.gallery .g-card').length===5,'home gallery 5 cards per page');
-ok($$('.g-img').length===5,'thumbnails rendered');
+ok($$('.gallery .g-card').length===10,'home gallery 10 cards per page');
+ok($$('.g-img').length===10,'thumbnails rendered');
 nav('home?r=user&cat=talk');ok($$('.g-card').length>0&&$$('.g-card').length<12,'category filter');
 click($$('[data-act="menu-open"]')[0]);ok(!!$('.drawer'),'hamburger opens drawer');click(byAct('menu-close'));ok(!$('.drawer'),'drawer closes');
 nav('home?r=user');ok(!txt().includes('멤버 관리'),'user: no admin menu');
@@ -53,10 +53,10 @@ nav('search?r=user&q=없는검색어');ok(txt().includes('검색 결과가 없�
 nav('search?r=user&from=2026-11-20&to=2026-11-26&cat=talk');const dn=$$('.g-card').length;ok(dn>0&&dn<12,'date+category filter ('+dn+')');
 nav('search?r=user&from=2030-01-01');ok(txt().includes('검색 결과가 없습니다'),'date filter excludes');
 // 목록 공통: 건수 줄 · 페이지 · 선택
-nav('home?r=user');ok(txt().includes('전체 12건')&&$$('.pager-btn').length===5,'home: total + pager (3 pages)');
-nav('home?r=user&p=3');ok($$('.g-card').length===2,'home: last page 2 cards');
+nav('home?r=user');ok(txt().includes('전체 12건')&&$$('.pager-btn').length===4,'home: total + pager (2 pages)');
+nav('home?r=user&p=2');ok($$('.g-card').length===2,'home: last page 2 cards');
 nav('glossary?r=user');ok(txt().includes('전체')&&txt().includes('선택 0건')&&!!byAct('gdel-bulk'),'glossary toolbar with 선택삭제');
-nav('members?r=admin&t=ok');ok(txt().includes('선택탈퇴')&&txt().includes('선택 0건'),'members ok toolbar 선택탈퇴');
+nav('members?r=admin&t=ok');nav('members?r=admin&t=pending');ok(txt().includes('선택승인')&&txt().includes('선택거절'),'pending bulk buttons');nav('glossary?r=user');ok(!!$('[data-act="pager"]')||$$('.pager-btn').length>=3,'pager always shown');nav('members?r=admin&t=ok');ok(txt().includes('선택탈퇴')&&txt().includes('선택 0건'),'members ok toolbar 선택탈퇴');
 nav('ops?r=admin');ok(txt().includes('전체 ')&&!txt().includes('선택 0건'),'ops: total only');
 const ot=[...$$('.tabs .tab')].map(x=>x.textContent.trim()).join('/');ok(ot==='전체/처리필요/숨김','ops tab order/labels: '+ot);
 // 탭

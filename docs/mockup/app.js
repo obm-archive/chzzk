@@ -4,7 +4,7 @@
 
   var SERVICE = '치지직로그';
   var TODAY = '2026-11-26';
-  var PAGE_SIZE = 5;
+  var PAGE_SIZE = 10;
   var CATEGORY = { talk: '토크' };
   var M = window.MOCK;
   var TERM_TYPES = ['닉네임', '밈·유행어', '인물', '게임 용어', '기타'];
@@ -116,7 +116,6 @@
     return { items: list.slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE), p: p, n: n, total: list.length };
   }
   function pager(pg, base) {
-    if (pg.n < 2) return '';
     var h = '<div class="inline pager"><button class="pager-btn" data-go="' + esc(base) + '&p=' + (pg.p - 1) + '"' + (pg.p < 2 ? ' disabled' : '') + '>‹</button>';
     for (var i = 1; i <= pg.n; i++) h += '<button class="pager-btn' + (i === pg.p ? ' on' : '') + '" data-go="' + esc(base) + '&p=' + i + '">' + i + '</button>';
     return h + '<button class="pager-btn" data-go="' + esc(base) + '&p=' + (pg.p + 1) + '"' + (pg.p >= pg.n ? ' disabled' : '') + '>›</button></div>';
@@ -334,8 +333,8 @@
     var pg = pageOf(state.gloss, q);
     var ids = pg.items.filter(function (g) { return canEditTerm(g, admin); }).map(function (g) { return g.id; });
     var picked = Object.keys(state.sel).filter(function (k) { return k.charAt(0) === 'g' && state.sel[k]; }).length;
-    var h = '<div class="inline"><h1 class="title grow">용어집</h1>' + btn('용어추가', 'term-add', '', 'btn-primary') + '</div>';
-    h += toolbar(pg.total, picked, btn('선택삭제', 'gdel-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger'));
+    var h = '<div class="inline"><h1 class="title grow">용어집</h1></div>';
+    h += toolbar(pg.total, picked, btn('용어추가', 'term-add', '', 'btn-primary') + btn('선택삭제', 'gdel-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger'));
     h += '<div class="list"><div class="row row-head"><span class="c-xs"><label class="check"><input type="checkbox" data-act="gsel-all"></label></span><span class="c-s">용어</span><span class="c-s">분류</span><span class="c-fill">설명</span>' +
       '<span class="c-s c-hide">작성자</span><span class="c-act">관리</span></div>';
     pg.items.forEach(function (g) {
@@ -361,9 +360,11 @@
     }
     var pg = pageOf(list, q);
     var picked = Object.keys(state.sel).filter(function (k) { return k.charAt(0) === 'm' && state.sel[k]; }).length;
-    h += t === 'ok' ? toolbar(pg.total, picked, btn('선택탈퇴', 'withdraw-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger')) : toolbar(pg.total, null);
+    var off = picked ? '' : 'disabled';
+    h += t === 'ok' ? toolbar(pg.total, picked, btn('선택탈퇴', 'withdraw-bulk', off, 'btn-secondary is-danger')) :
+      t === 'pending' ? toolbar(pg.total, picked, btn('선택승인', 'm-approve-bulk', off, 'btn-primary') + btn('선택거절', 'm-reject-bulk', off, 'btn-secondary is-danger')) : toolbar(pg.total, null);
     var head = '';
-    if (t === 'pending') head = '<span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-s">등급 답변</span><span class="c-s">최근 게시물</span><span class="c-act">관리</span>';
+    if (t === 'pending') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-s">등급 답변</span><span class="c-s">최근 게시물</span><span class="c-act">관리</span>';
     if (t === 'ok') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-m">최근 접속</span><span class="c-act">관리</span>';
     if (t === 'out') head = '<span class="c-fill">닉네임</span><span class="c-s">상태</span><span class="c-s">일자</span>';
     h += '<div class="list"><div class="row row-head">' + head + '</div>';
@@ -372,7 +373,7 @@
       var nick = '<span class="c-fill bold">' + esc(m.nick) + '</span>';
       var row = '';
       if (t === 'pending') {
-        row = line(nick + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
+        row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="m' + m.id + '"' + (state.sel['m' + m.id] ? ' checked' : '') + '></label></span>' + nick + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
           line(ml('등급 답변') + '<span class="c-s m-end">' + esc(m.grade) + '</span>') +
           line(ml('최근 게시물') + '<span class="c-s m-end"><button class="link" data-act="seek" data-v="링크">링크</button></span>') +
           '<span class="c-act">' + rbtn('승인', 'm-approve', m.id, 'btn-primary') + rbtn('거절', 'm-reject', m.id, 'btn-secondary is-danger') + '</span>';
@@ -508,6 +509,8 @@
     },
     'modal-close': function () { state.modal = null; state.err = ''; render(); },
     'm-approve': function (el) { setMember(el.getAttribute('data-id'), 'ok'); render(); toast('승인했습니다'); },
+    'm-approve-bulk': function () { selectedIds('m').forEach(function (id) { setMember(id, 'ok'); }); state.sel = {}; render(); toast('선택한 멤버를 승인했습니다'); },
+    'm-reject-bulk': function () { selectedIds('m').forEach(function (id) { setMember(id, 'out', '거절'); }); state.sel = {}; render(); toast('선택한 멤버를 거절했습니다'); },
     'm-reject': function (el) { setMember(el.getAttribute('data-id'), 'out', '거절'); render(); toast('거절했습니다'); },
     withdraw: function (el) { state.modal = { kind: 'confirm', what: 'member', title: '탈퇴 처리', yes: '탈퇴', ids: [+el.getAttribute('data-id')], text: '선택한 1명을 탈퇴 처리합니다. 탈퇴한 멤버는 다시 가입 신청할 수 있습니다.' }; render(); },
     'withdraw-bulk': function () {
@@ -527,7 +530,8 @@
     idle: function (el) { state.idle = +el.getAttribute('data-v'); state.sel = {}; render(); },
     'sel-all': function (el) {
       var on = el.checked, q = parse().q;
-      var rows = state.members.filter(function (m) { return m.st === 'ok' && daysAgo(m.seen) >= state.idle; });
+      var tb = q.t || 'pending';
+      var rows = state.members.filter(function (m) { return m.st === tb && (tb !== 'ok' || daysAgo(m.seen) >= state.idle); });
       pageOf(rows, q).items.forEach(function (m) { state.sel['m' + m.id] = on; });
       render();
     },
