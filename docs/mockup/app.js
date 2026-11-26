@@ -315,8 +315,8 @@
       var own = g.author === '나';
       var acts = '';
       if (own || admin) acts += rbtn('수정', 'term-edit', g.id) + rbtn('삭제', 'term-del', g.id, 'btn-secondary is-danger');
-      h += '<div class="row">' + line('<span class="c-m bold clip">' + esc(g.term) + '</span><span class="c-s m-end"><span class="chip">' + esc(g.type) + '</span></span>') +
-        '<span class="c-fill clip">' + esc(g.desc) + '</span><span class="c-s c-hide">' + esc(g.author) + '</span><span class="c-act">' + acts + '</span></div>';
+      h += '<div class="row">' + line('<span class="c-m bold">' + esc(g.term) + '</span><span class="c-s m-end"><span class="chip">' + esc(g.type) + '</span></span>') +
+        '<span class="c-fill">' + esc(g.desc) + '</span><span class="c-s c-hide">' + esc(g.author) + '</span><span class="c-act">' + acts + '</span></div>';
     });
     return shell('glossary', r, h + '</div>');
   }
@@ -334,18 +334,18 @@
     var picked = list.filter(function (m) { return state.sel[m.id]; }).length;
     if (t === 'ok') h += '<div class="inline"><span class="small sub grow">' + list.length + '명 · 선택 ' + picked + '명</span>' + btn('선택 탈퇴', 'withdraw-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger') + '</div>';
     var head = '';
-    if (t === 'pending') head = '<span class="c-m">닉네임</span><span class="c-s">가입일</span><span class="c-s">등급 답변</span><span class="c-l">최근 게시물</span><span class="c-fill"></span><span class="c-act">관리</span>';
+    if (t === 'pending') head = '<span class="c-m">닉네임</span><span class="c-s">가입일</span><span class="c-s">등급 답변</span><span class="c-s">최근 게시물</span><span class="c-fill"></span><span class="c-act">관리</span>';
     if (t === 'ok') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-m">닉네임</span><span class="c-s">가입일</span><span class="c-l">최근 접속</span><span class="c-fill"></span><span class="c-act">관리</span>';
     if (t === 'out') head = '<span class="c-m">닉네임</span><span class="c-s">상태</span><span class="c-s">일자</span>';
     h += '<div class="list"><div class="row row-head">' + head + '</div>';
     if (!list.length) h += '<div class="row mute">해당하는 멤버가 없습니다.</div>';
     list.forEach(function (m) {
-      var nick = '<span class="c-m bold clip">' + esc(m.nick) + '</span>';
+      var nick = '<span class="c-m bold">' + esc(m.nick) + '</span>';
       var row = '';
       if (t === 'pending') {
         row = line(nick + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
           line(ml('등급 답변') + '<span class="c-s m-end">' + esc(m.grade) + '</span>') +
-          line(ml('최근 게시물') + '<span class="c-l m-end"><button class="link" data-act="seek" data-v="링크">링크</button></span>') +
+          line(ml('최근 게시물') + '<span class="c-s m-end"><button class="link" data-act="seek" data-v="링크">링크</button></span>') +
           '<span class="c-fill"></span><span class="c-act">' + rbtn('승인', 'm-approve', m.id, 'btn-primary') + rbtn('거절', 'm-reject', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'ok') {
@@ -366,7 +366,7 @@
     state.ops.forEach(function (o) {
       h += '<div class="row">' + line('<span class="c-m">' + o.no + '</span><span class="c-s m-end">' +
         '<span class="chip ' + o.cls + '">' + o.st + (o.st === '처리 중' ? ' ' + o.pct + '%' : '') + '</span>' + '</span>') +
-        '<span class="c-fill clip">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(0, 16)) + '</span>' +
+        '<span class="c-fill">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(0, 16)) + '</span>' +
         '<span class="c-act">' + rbtn('재처리', 'post-redo', o.no) + rbtn('병합·분할', 'post-split', o.no) + '</span></div>';
     });
     return shell('ops', 'admin', h + '</div>');

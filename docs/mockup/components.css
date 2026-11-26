@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .check { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-s); }
 
 /* ── 칩(태그 포함) ── */
-.chip { display: inline-flex; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; align-items: center; height: calc(var(--sp-4) + var(--sp-1)); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-xs); color: var(--c-text-sub); }
+.chip { display: inline-flex; white-space: nowrap; align-items: center; height: calc(var(--sp-4) + var(--sp-1)); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-xs); color: var(--c-text-sub); }
 
 /* ── 카드 · 안내 · 인용 ── */
 .card { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); padding: var(--sp-4); }
@@ -103,7 +103,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .cap-time { position: absolute; top: var(--sp-2); left: var(--sp-2); padding: 0 var(--sp-2); background: var(--c-overlay); border: 0; border-radius: var(--r-control); color: var(--c-on-ink); font-size: var(--fs-xs); line-height: var(--sp-4); cursor: pointer; }
 .g-img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .g-body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
-.g-title { font-weight: var(--fw-bold); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.g-title { font-weight: var(--fw-bold); }
 
 /* ── 목록 ── */
 .list { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); overflow: hidden; }
@@ -112,16 +112,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .row-head { background: var(--c-fill); color: var(--c-text-sub); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
 .row-link { cursor: pointer; }
 .row-link:hover { background: var(--c-fill); }
-.c-xs { flex: none; width: var(--col-xs); }
-.c-s { flex: none; width: var(--col-s); }
-.c-m { flex: none; width: var(--col-m); }
-.c-l { flex: none; width: var(--col-l); }
-.c-b { flex: none; width: var(--col-b); }
+.c-xs { flex: 0 1 var(--col-xs); min-width: 0; }
+.c-s { flex: 0 1 var(--col-s); min-width: 0; }
+.c-m { flex: 0 1 var(--col-m); min-width: 0; }
+.c-l { flex: 0 1 var(--col-l); min-width: 0; }
+.c-b { flex: 0 1 var(--col-b); min-width: 0; }
 .c-act { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-2); }
 .c-fill { flex: 1; min-width: 0; }
 .line { display: contents; }
 .m-label { display: none; }
-.clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── 모달 · 토스트 · 진행 막대 ── */
 .modal-bg { position: fixed; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--c-overlay); }
@@ -164,9 +163,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .line { display: flex; align-items: center; gap: var(--sp-3); }
   .m-end { margin-left: auto; }
   .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
-  .c-xs, .c-s, .c-m, .c-b, .c-l { width: auto; }
+  .c-xs, .c-s, .c-m, .c-b, .c-l { flex: none; }
   .c-act { width: 100%; }
   .m-grow { flex: 1; }
   .c-act:empty, .c-fill:empty { display: none; }
-  .clip { white-space: normal; }
-}
+  }
