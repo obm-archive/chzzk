@@ -32,7 +32,7 @@ jobs:
         run: |
           yt-dlp -f "worst" --download-sections "*0-30" \
             --downloader-args "ffmpeg_i:-allowed_extensions ALL -extension_picky 0" \
-            -o out/clip.%(ext)s "https://chzzk.naver.com/video/${{ inputs.video_no }}" 2>&1 | tail -15 | tee out/download.txt || true
+            -o "out/clip.%(ext)s" "https://chzzk.naver.com/video/${{ inputs.video_no }}" 2>&1 | tail -15 | tee out/download.txt || true
           ls -la out | tee -a out/download.txt
       - name: 결과 저장
         run: |
