@@ -54,14 +54,13 @@
   --col-xs: 56px;
   --col-s: 112px;
   --col-m: 160px;
-  --col-l: 208px;
+  --col-l: 176px;
 
   /* 레이아웃 */
   --w-lnb: 220px;
   --w-auth: 480px;
   --w-thumb: 168px;
   --w-modal: 440px;
-  --bp-mobile: 640px;
   --h-header: 56px;
   --h-tabbar: 64px;
 

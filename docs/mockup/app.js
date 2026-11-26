@@ -154,9 +154,9 @@
   function card(p, line, seg) {
     var thumb = p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '';
     return '<button class="g-card" data-go="post?r=' + (parse().q.r || 'user') + '&no=' + p.no + (seg !== undefined ? '&seg=' + seg : '') + '">' +
-      '<div class="g-thumb">' + thumb + '</div><div class="g-body"><div class="inline"><span class="chip">' + esc(catLabel(p.cat)) + '</span></div>' +
+      '<div class="g-thumb">' + thumb + '</div><div class="g-body"><div class="inline fill"><span class="chip">' + esc(catLabel(p.cat)) + '</span>' + (line ? '<span class="xsmall sub end">' + esc(line) + '</span>' : '') + '</div>' +
       '<div class="g-title">' + esc(p.title) + '</div><div class="inline"><span class="xsmall mute nowrap">' + esc(p.date.slice(0, 10)) + '</span><span class="xsmall mute nowrap">' + dur(p.dur) + '</span></div>' +
-      (line ? '<div class="xsmall sub">' + esc(line) + '</div>' : '') + '</div></button>';
+      '</div></button>';
   }
 
   /* ── 화면: 화면 목록 ── */
@@ -257,7 +257,7 @@
       h += '<div class="small sub">검색 결과 ' + hits.length + '건</div>';
       if (!hits.length) h += '<div class="notice">검색 결과가 없습니다. 다른 조건으로 검색해 보세요.</div>';
       else h += '<div class="gallery">' + hits.map(function (x) {
-        return card(x.p, x.segs.length ? '일치 구간 ' + x.segs.length + '건 · ' + M.segments[x.segs[0]].title : '', x.segs.length ? x.segs[0] : undefined);
+        return card(x.p, x.segs.length ? '일치 구간 ' + x.segs.length + '건' : '', x.segs.length ? x.segs[0] : undefined);
       }).join('') + '</div>';
     }
     return shell('search', r, h);

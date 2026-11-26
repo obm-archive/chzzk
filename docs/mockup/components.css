@@ -96,7 +96,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ── 갤러리 ── */
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
-.g-card { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3); background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); text-align: left; cursor: pointer; }
+.g-card { display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-3); background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); text-align: left; cursor: pointer; }
 .g-card:hover { border-color: var(--c-text); }
 .g-thumb { flex: none; width: var(--w-thumb); aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
 .cap { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
@@ -136,15 +136,25 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .hit { border-color: var(--c-text); }
 
 /* ── 모바일 ── */
-/* 중단점: 1024px 이하 = 왼쪽 메뉴를 햄버거로, 800px 이하 = 목록 행을 줄 단위로, 640px 이하 = 모바일 */
+/* 중단점은 2개만 쓴다 (@media에는 var()를 못 써서 여기 한 곳에 모아 둠)
+   1024 이하 = 태블릿: 왼쪽 메뉴를 햄버거로, 상단 이미지+요약을 위아래로
+   768 이하 = 모바일: 목록 행을 줄 단위로, 박스 해제, 하단 바 */
 @media (max-width: 1024px) {
   .lnb { display: none; }
   .menu-btn { display: flex; }
   .md-col { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 800px) {
-  .gallery { grid-template-columns: 1fr; }
+@media (max-width: 768px) {
+  .tabbar { display: flex; }
+  .main { padding: var(--sp-3) var(--sp-3) calc(var(--h-tabbar) + var(--sp-4)); }
+  .media { grid-template-columns: 1fr; gap: var(--sp-3); }
+  .gallery { grid-template-columns: 1fr; gap: 0; }
+  .card { padding: var(--sp-3) 0; background: transparent; border: 0; border-bottom: var(--bw) solid var(--c-line); border-radius: 0; }
+  .list { background: transparent; border: 0; border-radius: 0; }
+  .g-card { padding: var(--sp-3) 0; background: transparent; border: 0; border-bottom: var(--bw) solid var(--c-line); border-radius: 0; }
+  .g-card:hover { border-color: var(--c-line); }
+  .auth-box { padding: var(--sp-3); border: 0; background: transparent; }
   .row { flex-direction: column; align-items: stretch; gap: var(--sp-2); padding: var(--sp-3) 0; }
   .row-head { display: none; }
   .line { display: flex; align-items: center; gap: var(--sp-3); }
@@ -155,15 +165,4 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .m-grow { flex: 1; }
   .c-act:empty, .c-fill:empty { display: none; }
   .c-hide { display: none; }
-  .list { background: transparent; border: 0; border-radius: 0; }
-}
-
-@media (max-width: 640px) {
-  .tabbar { display: flex; }
-  .main { padding: var(--sp-3) var(--sp-3) calc(var(--h-tabbar) + var(--sp-4)); }
-  .media { grid-template-columns: 1fr; gap: var(--sp-3); }
-  .card { padding: var(--sp-3) 0; background: transparent; border: 0; border-bottom: var(--bw) solid var(--c-line); border-radius: 0; }
-  .auth-box { padding: var(--sp-3); border: 0; background: transparent; }
-  .g-card { padding: var(--sp-3) 0; background: transparent; border: 0; border-bottom: var(--bw) solid var(--c-line); border-radius: 0; }
-  .g-card:hover { border-color: var(--c-line); }
 }
