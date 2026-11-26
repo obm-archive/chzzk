@@ -1,0 +1,55 @@
+name: Test CHZZK download
+
+# Manual test: checks whether GitHub-hosted runners can reach a CHZZK VOD
+# with yt-dlp and download the first 60 seconds at low quality.
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "CHZZK VOD URL (e.g. https://chzzk.naver.com/video/123456)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VOD_URL: ${{ inputs.url }}
+    steps:
+      - name: Show runner location
+        run: |
+          echo "Runner country: $(curl -s https://ipinfo.io/country || echo unknown)"
+
+      - name: Install yt-dlp
+        run: |
+          python -m pip install --upgrade yt-dlp
+          yt-dlp --version
+          ffmpeg -version | head -n 1
+
+      - name: Fetch video info only
+        run: |
+          yt-dlp --no-playlist --skip-download \
+            --print "title: %(title)s" \
+            --print "duration(sec): %(duration)s" \
+            --print "extractor: %(extractor)s" \
+            "$VOD_URL"
+
+      - name: Download first 60 seconds (low quality)
+        run: |
+          mkdir -p out
+          yt-dlp --no-playlist \
+            -f "bv*[height<=480]+ba/b[height<=480]/worst" \
+            --download-sections "*0-60" \
+            -o "out/test.%(ext)s" \
+            "$VOD_URL"
+
+      - name: Show result
+        run: |
+          ls -lh out
+          for f in out/*; do
+            ffprobe -v error -show_entries format=duration,size -of default=nw=1 "$f"
+          done
