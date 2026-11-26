@@ -121,7 +121,7 @@
     return h + '<button class="pager-btn" data-go="' + esc(base) + '&p=' + (pg.p + 1) + '"' + (pg.p >= pg.n ? ' disabled' : '') + '>›</button></div>';
   }
   function toolbar(total, picked, action) {
-    return '<div class="inline"><span class="small sub grow">전체 ' + total + '건' + (picked === null ? '' : ' / 선택 ' + picked + '건') + '</span>' + (action || '') + '</div>';
+    return '<div class="inline"><span class="small sub grow nowrap">전체 ' + total + '건' + (picked === null ? '' : ' / 선택 ' + picked + '건') + '</span>' + (action || '') + '</div>';
   }
   function selCount(prefix, ids) {
     return ids.filter(function (id) { return state.sel[prefix + id]; }).length;

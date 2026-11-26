@@ -163,7 +163,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .line { display: flex; align-items: center; gap: var(--sp-3); }
   .m-end { margin-left: auto; }
   .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
-  .c-xs, .c-s, .c-m,   .c-act { width: 100%; }
+  .c-xs, .c-s, .c-m { flex: none; width: auto; }
+  .c-act { width: 100%; }
   .m-grow { flex: 1; }
   .c-act:empty, .c-fill:empty, .c-xs:empty { display: none; }
   .c-hide { display: none; }
