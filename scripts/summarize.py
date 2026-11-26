@@ -14,7 +14,7 @@ import time
 from google import genai
 from google.genai import types
 
-DEFAULT_MODELS = ["gemini-2.5-flash"]
+DEFAULT_MODELS = ["gemini-3.5-flash-lite", "gemini-3.8-flash"]
 USAGE = []  # token usage per successful call
 
 
@@ -39,60 +39,66 @@ def candidate_models(client: genai.Client) -> list[str]:
     return list(DEFAULT_MODELS)
 
 
+SKIP_WORDS = ("preview", "omni", "image", "tts", "live", "embedding", "audio", "robotics")
+
+
 def discover_models(client: genai.Client) -> list[str]:
     names = []
     try:
         for m in client.models.list():
             actions = getattr(m, "supported_actions", None) or []
             name = (m.name or "").replace("models/", "")
-            if "generateContent" in actions and "flash" in name:
+            if "generateContent" in actions and "flash" in name and not any(
+                w in name for w in SKIP_WORDS
+            ):
                 names.append(name)
     except Exception as e:  # noqa: BLE001
         print(f"Could not list models: {e}")
     names = sorted(set(names), reverse=True)
-    print("Available flash models:", names)
+    print("Available stable flash models:", names)
     return names
 
 
 def generate(client, contents, config=None):
-    """Try preferred model(s); if not found, fall back to discovered flash models."""
-    tried = []
+    """Try models in order; on quota/overload/not-found move to the next model at once.
+
+    Waits only between full rounds so a busy model never stalls the pipeline for long.
+    """
     models = candidate_models(client)
-    for attempt in range(2):
+    discovered = False
+    last_err = None
+    for rnd in range(3):
         for model in models:
-            if model in tried:
-                continue
-            tried.append(model)
-            for retry in range(3):
-                try:
-                    print(f"Calling model: {model}")
-                    resp = client.models.generate_content(
-                        model=model, contents=contents, config=config
-                    )
-                    um = getattr(resp, "usage_metadata", None)
-                    if um:
-                        USAGE.append({
-                            "model": model,
-                            "prompt": getattr(um, "prompt_token_count", None),
-                            "output": getattr(um, "candidates_token_count", None),
-                            "thoughts": getattr(um, "thoughts_token_count", None),
-                            "total": getattr(um, "total_token_count", None),
-                        })
-                    return model, resp.text
-                except Exception as e:  # noqa: BLE001
-                    msg = str(e)
-                    print(f"Model {model} error: {msg[:300]}")
-                    if "404" in msg or "NOT_FOUND" in msg:
-                        break  # try another model
-                    if "429" in msg or "RESOURCE_EXHAUSTED" in msg or "503" in msg:
-                        wait = 30 * (retry + 1)
-                        print(f"Rate limited / busy. Waiting {wait}s...")
-                        time.sleep(wait)
-                        continue
-                    raise
-        if attempt == 0:
-            models = discover_models(client)
-    raise RuntimeError("No working model found.")
+            try:
+                print(f"Calling model: {model}")
+                resp = client.models.generate_content(
+                    model=model, contents=contents, config=config
+                )
+                um = getattr(resp, "usage_metadata", None)
+                if um:
+                    USAGE.append({
+                        "model": model,
+                        "prompt": getattr(um, "prompt_token_count", None),
+                        "output": getattr(um, "candidates_token_count", None),
+                        "thoughts": getattr(um, "thoughts_token_count", None),
+                        "total": getattr(um, "total_token_count", None),
+                    })
+                return model, resp.text
+            except Exception as e:  # noqa: BLE001
+                msg = str(e)
+                last_err = e
+                print(f"Model {model} error: {msg[:200]}")
+                if any(k in msg for k in ("404", "NOT_FOUND", "429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE")):
+                    continue
+                raise
+        if not discovered:
+            discovered = True
+            extra = [m for m in discover_models(client) if m not in models]
+            models = models + extra
+        wait = 20 * (rnd + 1)
+        print(f"All models busy. Waiting {wait}s before next round...")
+        time.sleep(wait)
+    raise RuntimeError(f"No working model found. Last error: {last_err}")
 
 
 def summarize_audio(client, audio_path, start_sec):
