@@ -67,8 +67,8 @@
       { id: 7, nick: '회원04', st: 'ok', joined: '2026-09-15', seen: '2026-09-18' },
       { id: 8, nick: '회원05', st: 'ok', joined: '2026-08-10', seen: '2026-08-30' },
       { id: 9, nick: '회원06', st: 'ok', joined: '2026-07-01', seen: '2026-07-04' },
-      { id: 10, nick: '회원07', st: 'out', joined: '2026-06-01', seen: '2026-06-30', why: '탈퇴' },
-      { id: 11, nick: '신청자00', st: 'out', joined: '2026-11-01', seen: '', why: '거절' }
+      { id: 10, nick: '회원07', st: 'out', joined: '2026-06-01', seen: '2026-06-30', done: '2026-07-02', why: '탈퇴' },
+      { id: 11, nick: '신청자00', st: 'out', joined: '2026-11-01', seen: '', done: '2026-11-02', why: '거절' }
     ],
     ops: [
       { no: 16372880, title: '대기 중인 방송 예시', at: '2026-11-26 21:30:05', st: '대기', cls: '', hidden: false },
@@ -367,7 +367,7 @@
     var head = '';
     if (t === 'pending') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-s">등급 답변</span><span class="c-s">최근 게시물</span><span class="c-act">관리</span>';
     if (t === 'ok') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-m">최근 접속</span><span class="c-act">관리</span>';
-    if (t === 'out') head = '<span class="c-fill">닉네임</span><span class="c-s">상태</span><span class="c-s">일자</span>';
+    if (t === 'out') head = '<span class="c-fill">닉네임</span><span class="c-s">상태</span><span class="c-s">가입일</span><span class="c-s">처리일</span>';
     h += '<div class="list"><div class="row row-head">' + head + '</div>';
     if (!list.length) h += '<div class="row mute">해당하는 멤버가 없습니다.</div>';
     pg.items.forEach(function (m) {
@@ -385,7 +385,9 @@
           '<span class="c-act">' + rbtn('탈퇴', 'withdraw', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'out') {
-        row = line(nick + '<span class="c-s m-end"><span class="chip">' + esc(m.why) + '</span></span>') + '<span class="c-s">' + esc(m.seen || m.joined) + '</span>';
+        row = line(nick + '<span class="c-s m-end"><span class="chip">' + esc(m.why) + '</span></span>') +
+          line(ml('가입일') + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
+          line(ml('처리일') + '<span class="c-s m-end">' + esc(m.done) + '</span>');
       }
       h += '<div class="row">' + row + '</div>';
     });
@@ -455,7 +457,7 @@
   }
   function findG(id) { return state.gloss.filter(function (g) { return g.id === +id; })[0]; }
   function setMember(id, st, why) {
-    state.members.forEach(function (m) { if (m.id === +id) { m.st = st; if (why) m.why = why; } });
+    state.members.forEach(function (m) { if (m.id === +id) { m.st = st; if (why) { m.why = why; m.done = TODAY; } } });
   }
   function selectedIds(prefix) {
     return Object.keys(state.sel).filter(function (k) { return k.charAt(0) === prefix && state.sel[k]; }).map(function (k) { return +k.slice(1); });
