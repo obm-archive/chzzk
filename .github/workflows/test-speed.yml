@@ -1,0 +1,46 @@
+name: Test download speed
+
+# Compares sequential vs. concurrent HLS fragment downloads (60 seconds each)
+# to find out how much faster a full VOD download can be.
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "CHZZK VOD URL"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  speed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VOD_URL: ${{ inputs.url }}
+    steps:
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --upgrade yt-dlp
+
+      - name: List formats
+        run: yt-dlp --no-playlist -F "$VOD_URL" || true
+
+      - name: Speed test (60 seconds each)
+        run: |
+          run_case () {
+            LABEL="$1"; FMT="$2"; N="$3"
+            rm -rf sp; mkdir sp
+            echo "=== $LABEL (format: $FMT, concurrent fragments: $N) ==="
+            timeout 60 yt-dlp --no-playlist -f "$FMT" --downloader m3u8:native \
+              -N "$N" -o "sp/v.%(ext)s" "$VOD_URL" 2>&1 \
+              | grep -E "frag|Destination|ERROR" | tail -2 || true
+            echo "downloaded size in 60s: $(du -sh sp | cut -f1)"
+          }
+          run_case "A baseline"          "bv*[height<=480]+ba/b[height<=480]/worst" 1
+          run_case "B concurrent x8"     "bv*[height<=480]+ba/b[height<=480]/worst" 8
+          run_case "C concurrent x16"    "bv*[height<=480]+ba/b[height<=480]/worst" 16
+          run_case "D audio only x16"    "ba/worst"                                 16
