@@ -47,7 +47,7 @@ click($$('[data-act="menu-open"]')[0]);ok(!!$('.drawer'),'hamburger opens drawer
 nav('home?r=user');ok(!txt().includes('멤버 관리'),'user: no admin menu');
 nav('home?r=admin');ok(txt().includes('멤버 관리')&&txt().includes('처리 현황'),'admin: extra menu in same screen');
 // 검색
-nav('search?r=user');ok($('[data-f="q"]').placeholder===''&&($('[data-f="from"]').compareDocumentPosition($('[data-f="q"]'))&4)!==0,'search: keyword below dates, no placeholder');ok(!!$('[data-f="from"]')&&!!$('[data-f="to"]')&&!!$('[data-f="cat"]'),'search: keyword + date range + category');
+nav('search?r=user');ok($('[data-f="q"]').placeholder==='이 얘기 언제 했더라?'&&($('[data-f="from"]').compareDocumentPosition($('[data-f="q"]'))&4)!==0,'search: keyword below dates, no placeholder');ok(!!$('[data-f="from"]')&&!!$('[data-f="to"]')&&!!$('[data-f="cat"]'),'search: keyword + date range + category');
 setf('q','캠핑장');click(byAct('search'));settle();ok(txt().includes('검색 결과')&&$$('.g-card').length>0,'search hits as gallery');
 nav('search?r=user&q=없는검색어');ok(txt().includes('검색 결과가 없습니다'),'no result state');
 nav('search?r=user&from=2026-11-20&to=2026-11-26&cat=talk');const dn=$$('.g-card').length;ok(dn>0&&dn<12,'date+category filter ('+dn+')');
@@ -58,7 +58,7 @@ nav('members?r=admin&t=ok');ok($$('.tabs .tab').length===3,'members tabs');
 nav('me?r=user');ok(txt().includes('내 정보')&&txt().includes('로그아웃'),'me screen');
 nav('post?r=user&no=16268684');ok(txt().includes('요약 처리 전'),'unprocessed post notice');
 // 상세
-nav('post?r=user&seg=2');ok(!!$('.split')&&!!$('.aside'),'detail split layout');ok(!!$('.hit'),'focus exists');ok($$('.card.hit').length===1,'one focused segment');ok(!txt().includes('재처리'),'user detail: no admin buttons');
+nav('post?r=user&seg=2');ok($$('.card.media').length>0&&!$('.aside'),'detail: media layout per segment');ok(!!$('.hit'),'focus exists');ok($$('.card.hit').length===1,'one focused segment');ok(!txt().includes('재처리'),'user detail: no admin buttons');
 click(byAct('seek'));ok(!!$('#toast'),'timestamp toast');
 nav('post?r=admin');ok(txt().includes('재처리'),'admin detail: extra buttons');
 // 용어집

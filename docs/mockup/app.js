@@ -150,7 +150,7 @@
     var thumb = p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '';
     return '<button class="g-card" data-go="post?r=' + (parse().q.r || 'user') + '&no=' + p.no + (seg !== undefined ? '&seg=' + seg : '') + '">' +
       '<div class="g-thumb">' + thumb + '</div><div class="g-body"><div class="inline"><span class="chip">' + esc(catLabel(p.cat)) + '</span></div>' +
-      '<div class="g-title">' + esc(p.title) + '</div><div class="xsmall mute">' + esc(p.date.slice(0, 10)) + ' · ' + dur(p.dur) + '</div>' +
+      '<div class="g-title">' + esc(p.title) + '</div><div class="xsmall mute">' + esc(p.date.slice(0, 10)) + '</div><div class="xsmall mute">' + dur(p.dur) + '</div>' +
       (line ? '<div class="xsmall sub">' + esc(line) + '</div>' : '') + '</div></button>';
   }
 
@@ -233,7 +233,7 @@
       '<div class="field grow"><label class="label">카테고리</label><select class="input" data-f="cat"><option value="">전체</option>' +
       categories().map(function (c) { return '<option value="' + esc(c) + '"' + (f.cat === c ? ' selected' : '') + '>' + esc(catLabel(c)) + '</option>'; }).join('') +
       '</select></div></div>' +
-      '<div class="field"><label class="label">키워드</label><input class="input" data-f="q" value="' + val('q') + '"></div>' +
+      '<div class="field"><label class="label">키워드</label><input class="input" data-f="q" value="' + val('q') + '" placeholder="이 얘기 언제 했더라?"></div>' +
       '<div class="inline">' + btn('검색', 'search', '', 'btn-primary') + '</div></div>';
     if (searched) {
       var hits = [];
@@ -269,24 +269,22 @@
     h += '<div class="inline"><span class="chip">' + esc(catLabel(p.cat)) + '</span><span class="small sub">' + esc(p.date.slice(0, 16)) + ' · ' + dur(p.dur) + '</span></div>';
     if (r === 'admin') h += '<div class="inline">' + btn('숨김', 'post-hide') + btn('재처리', 'post-redo') + '</div>';
     if (p.no !== DETAIL_NO) return shell('', r, h + '<div class="notice is-warn">아직 요약 처리 전인 방송입니다.</div>');
-    var side = '<div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div>';
-    side += '<div class="list">' + LINKED.map(function (x) {
+    h += '<div class="media"><div class="stack"><div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div></div><div class="stack">';
+    h += '<div class="list">' + LINKED.map(function (x) {
       return '<div class="row"><span class="c-s bold">' + esc(x.label) + '</span><span class="c-fill sub">' + dur(x.dur) +
         '</span><span class="c-b"><a class="link" href="https://chzzk.naver.com/video/' + x.no + '" target="_blank" rel="noopener">치지직에서 보기</a></span></div>';
     }).join('') + '</div>';
-    side += '<div class="card stack"><div class="h2">전체 요약</div><p class="small">' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div>';
-    var segs = '<div class="h2">구간별 요약</div>';
+    h += '<div class="card stack"><div class="h2">전체 요약</div><p>' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div></div></div>';
+    h += '<div class="h2">구간별 요약</div>';
     M.segments.forEach(function (s, i) {
-      segs += '<div class="card stack' + (focus === i ? ' hit' : '') + '">' +
-        '<div class="inline"><button class="link" data-act="seek" data-v="' + esc(s.start) + '">' + esc(s.start) + ' – ' + esc(s.end) + '</button></div>' +
-        '<div class="cap"></div>' +
+      h += '<div class="card media' + (focus === i ? ' hit' : '') + '"><div class="stack">' +
+        '<button class="link" data-act="seek" data-v="' + esc(s.start) + '">' + esc(s.start) + ' – ' + esc(s.end) + '</button><div class="cap"></div></div><div class="stack">' +
         s.quotes.map(function (x) {
           return '<div class="quote"><button class="link" data-act="seek" data-v="' + esc(x.time) + '">' + esc(x.time) + '</button> ' + esc(x.text) + '</div>';
         }).join('') +
         '<div class="bold">' + esc(s.title) + '</div><p class="small sub">' + esc(s.summary) + '</p>' +
-        '<div class="inline">' + chips(s.keywords) + '</div></div>';
+        '<div class="inline">' + chips(s.keywords) + '</div></div></div>';
     });
-    h += '<div class="split"><div class="stack">' + segs + '</div><div class="aside">' + side + '</div></div>';
     return shell('', r, h);
   }
 
