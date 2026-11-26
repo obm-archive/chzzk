@@ -58,10 +58,10 @@
   --col-b: 96px;
 
   /* 레이아웃 */
-  --w-main: 1440px;
   --w-lnb: 220px;
   --w-card: 260px;
-  --w-form: 360px;
+  --w-auth: 480px;
+  --w-cap: 400px;
   --w-modal: 440px;
   --bp-mobile: 640px;
   --h-header: 56px;

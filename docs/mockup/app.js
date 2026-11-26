@@ -43,6 +43,11 @@
     { no: 8, name: '처리 현황', items: [['관리자', 'ops?r=admin']] }
   ];
 
+  var LINKED = [
+    { label: '1부', no: DETAIL_NO, dur: M.post.duration },
+    { label: '2부', no: 16365999, dur: 5400 }
+  ];
+
   var state = {
     form: { nick: '', pw: '', grade: '', link: '', q: '', from: '', to: '', cat: '', tname: '', tdesc: '' },
     err: '', modal: null, menu: false, sel: {}, idle: 0, toastTimer: null,
@@ -166,11 +171,11 @@
   /* ── 화면: 접속 ── */
   function vLogin(q) {
     var signup = q.tab === 'signup';
-    var h = '<main class="form-box stack"><h1 class="title">' + esc(SERVICE) + '</h1>';
+    var h = '<main class="auth"><div class="auth-box"><h1 class="title">' + esc(SERVICE) + '</h1>';
     h += tabs([['login', '로그인', 'login'], ['signup', '가입 신청', 'login?tab=signup']], signup ? 'signup' : 'login');
     if (signup && q.s === 'done') {
       h += '<div class="notice is-info">가입 신청이 접수되었습니다. 승인되면 로그인할 수 있습니다.</div>' +
-        '<button class="btn btn-primary fill" data-go="login">로그인으로 이동</button></main>';
+        '<button class="btn btn-primary fill" data-go="login">로그인으로 이동</button></div></main>';
       return h;
     }
     if (q.s === 'pending') h += '<div class="notice is-warn">가입 승인 대기 중입니다. 승인 후 이용할 수 있습니다.</div>';
@@ -191,7 +196,7 @@
     } else {
       h += '<div class="inline">' + btn('사용자 로그인', 'login-user', '', 'btn-primary grow') + btn('관리자 로그인', 'login-admin', '', 'btn-secondary grow') + '</div>';
     }
-    return h + '</main>';
+    return h + '</div></main>';
   }
 
   /* ── 화면: 홈(갤러리) ── */
@@ -263,16 +268,22 @@
     h += '<div class="inline"><span class="chip">' + esc(catLabel(p.cat)) + '</span><span class="small sub">' + esc(p.date.slice(0, 16)) + ' · ' + dur(p.dur) + '</span></div>';
     if (r === 'admin') h += '<div class="inline">' + btn('숨김', 'post-hide') + btn('재처리', 'post-redo') + '</div>';
     if (p.no !== DETAIL_NO) return shell('', r, h + '<div class="notice is-warn">아직 요약 처리 전인 방송입니다.</div>');
+    h += '<div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div>';
+    h += '<div class="h2">연결된 방송</div><div class="list">' + LINKED.map(function (x) {
+      return '<div class="row"><span class="c-s bold">' + esc(x.label) + '</span><span class="c-fill clip">chzzk.naver.com/video/' + x.no + '</span><span class="c-m c-hide">' + dur(x.dur) +
+        '</span><span class="c-b"><a class="link" href="https://chzzk.naver.com/video/' + x.no + '" target="_blank" rel="noopener">치지직에서 보기</a></span></div>';
+    }).join('') + '</div>';
     h += '<div class="card stack"><div class="h2">전체 요약</div><p>' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div>';
     h += '<div class="h2">구간별 요약</div>';
     M.segments.forEach(function (s, i) {
       h += '<div class="card stack' + (focus === i ? ' hit' : '') + '">' +
         '<div class="inline"><button class="link" data-act="seek" data-v="' + esc(s.start) + '">' + esc(s.start) + ' – ' + esc(s.end) + '</button></div>' +
-        '<div class="bold">' + esc(s.title) + '</div><p class="small sub">' + esc(s.summary) + '</p>' +
-        '<div class="inline">' + chips(s.keywords) + '</div>' +
+        '<div class="cap"></div>' +
         s.quotes.map(function (x) {
           return '<div class="quote"><button class="link" data-act="seek" data-v="' + esc(x.time) + '">' + esc(x.time) + '</button> ' + esc(x.text) + '</div>';
-        }).join('') + '</div>';
+        }).join('') +
+        '<div class="bold">' + esc(s.title) + '</div><p class="small sub">' + esc(s.summary) + '</p>' +
+        '<div class="inline">' + chips(s.keywords) + '</div></div>';
     });
     return shell('', r, h);
   }
@@ -343,7 +354,7 @@
 
   /* ── 화면: 처리 현황 ── */
   function vOps() {
-    var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">네이버 인증 쿠키 만료가 가까워졌습니다. 성인 방송 수집 전에 갱신해 주세요.</div>';
+    var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">연령 제한 방송 수집에 쓰는 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
     h += '<div class="list"><div class="row row-head"><span class="c-m">방송 번호</span><span class="c-fill">제목</span><span class="c-m c-hide">시작</span><span class="c-m">상태</span><span class="c-l"></span></div>';
     state.ops.forEach(function (o) {
       h += '<div class="row"><span class="c-m">' + o.no + '</span><span class="c-fill clip">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(5, 16)) + '</span><span class="c-m">' +
