@@ -47,6 +47,8 @@
 
   /* 컨트롤 높이, 아이콘 크기 */
   --h-control: 40px;
+  --h-tab: 44px;
+  --h-chip: 28px;
   --h-row: 64px;
   --icon: 20px;
 
@@ -62,6 +64,12 @@
   --w-modal: 440px;
   --h-header: 56px;
   --h-tabbar: 64px;
+
+  /* 겹침 순서 */
+  --z-bar: 1;
+  --z-modal: 2;
+  --z-drawer: 3;
+  --z-toast: 4;
 
   /* 그림자는 모달에만 */
   --shadow-dialog: 0 8px 32px rgba(0, 0, 0, 0.16);

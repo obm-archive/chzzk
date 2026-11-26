@@ -162,11 +162,11 @@
     var h = '<header class="header"><button class="menu-btn" data-act="menu-open">' + icon('menu') + '</button>' +
       '<button class="logo" data-go="home?r=' + r + '">' + esc(SERVICE) + '</button><span class="grow"></span>' +
       '<span class="small sub c-hide">' + esc(profile(r)) + '</span><button class="btn btn-secondary" data-go="login">로그아웃</button></header>';
-    h += '<div class="body"><nav class="lnb">' + side(cur, r) + '</nav><main class="main stack">' + body + '</main></div>';
+    h += '<div class="body"><nav class="nav lnb">' + side(cur, r) + '</nav><main class="main stack">' + body + '</main></div>';
     h += '<nav class="tabbar">' + MENU.map(function (it) {
       return '<button class="tabbar-item' + (cur === it.key ? ' on' : '') + '" data-go="' + it.to + '?r=' + r + '">' + icon(it.icon) + esc(it.label) + '</button>';
     }).join('') + '</nav>';
-    if (state.menu) h += '<div class="modal-bg" data-act="menu-close"></div><nav class="drawer">' + side(cur, r) + '</nav>';
+    if (state.menu) h += '<div class="modal-bg" data-act="menu-close"></div><nav class="nav drawer">' + side(cur, r) + '</nav>';
     return h;
   }
 
@@ -174,7 +174,7 @@
   function card(p, line, seg) {
     var thumb = p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '';
     return '<button class="g-card" data-go="post?r=' + (parse().q.r || 'user') + '&no=' + p.no + (seg !== undefined ? '&seg=' + seg : '') + '">' +
-      '<div class="g-thumb">' + thumb + '</div><div class="g-body"><div class="inline fill"><span class="chip">' + esc(catLabel(p.cat)) + '</span>' + (line ? '<span class="xsmall sub end">' + esc(line) + '</span>' : '') + '</div>' +
+      '<div class="cap g-thumb">' + thumb + '</div><div class="g-body"><div class="inline fill"><span class="chip">' + esc(catLabel(p.cat)) + '</span>' + (line ? '<span class="xsmall sub end">' + esc(line) + '</span>' : '') + '</div>' +
       '<div class="g-title">' + esc(p.title) + '</div><div class="inline"><span class="xsmall mute nowrap">' + esc(p.date.slice(0, 10)) + '</span><span class="xsmall mute nowrap">' + dur(p.dur) + '</span></div>' +
       '</div></button>';
   }

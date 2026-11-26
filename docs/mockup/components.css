@@ -14,7 +14,7 @@ body {
 }
 
 input, textarea, select { font: inherit; color: inherit; }
-button { font: inherit; color: inherit; cursor: pointer; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 
 /* ── 글자 ── */
 .title { font-size: var(--fs-xl); font-weight: var(--fw-bold); }
@@ -25,7 +25,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .nowrap { white-space: nowrap; }
 .sub { color: var(--c-text-sub); }
 .mute { color: var(--c-text-mute); }
-.link { background: none; border: 0; color: var(--c-link); cursor: pointer; padding: 0; text-decoration: none; }
+.link { color: var(--c-link); padding: 0; }
 .link:hover { text-decoration: underline; }
 .icon { flex: none; width: var(--icon); height: var(--icon); }
 
@@ -41,24 +41,25 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .end { margin-left: auto; }
 
 /* ── 헤더 (로고 · 프로필 · 로그아웃) ── */
-.header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: var(--sp-3); height: var(--h-header); padding: 0 var(--sp-3); background: var(--c-surface); border-bottom: var(--bw) solid var(--c-line); }
-.logo { background: none; border: 0; font-size: var(--fs-l); font-weight: var(--fw-bold); }
-.menu-btn { display: none; align-items: center; justify-content: center; width: var(--h-control); height: var(--h-control); background: none; border: 0; }
+.header { position: sticky; top: 0; z-index: var(--z-bar); display: flex; align-items: center; gap: var(--sp-3); height: var(--h-header); padding: 0 var(--sp-3); background: var(--c-surface); border-bottom: var(--bw) solid var(--c-line); }
+.logo { font-size: var(--fs-l); font-weight: var(--fw-bold); }
+.menu-btn { display: none; align-items: center; justify-content: center; width: var(--h-control); height: var(--h-control); }
 
 /* ── 왼쪽 메뉴(PC) · 서랍(모바일) ── */
-.lnb { position: sticky; top: var(--h-header); flex: none; width: var(--w-lnb); height: calc(100vh - var(--h-header)); padding: var(--sp-3) var(--sp-2); background: var(--c-surface); border-right: var(--bw) solid var(--c-line); display: flex; flex-direction: column; gap: var(--sp-1); overflow-y: auto; }
-.drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 3; width: var(--w-lnb); padding: var(--sp-3) var(--sp-2); background: var(--c-surface); display: flex; flex-direction: column; gap: var(--sp-1); overflow-y: auto; }
+.nav { width: var(--w-lnb); padding: var(--sp-3) var(--sp-2); background: var(--c-surface); display: flex; flex-direction: column; gap: var(--sp-1); overflow-y: auto; }
+.lnb { position: sticky; top: var(--h-header); flex: none; height: calc(100vh - var(--h-header)); border-right: var(--bw) solid var(--c-line); }
+.drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: var(--z-drawer); }
 .lnb-title { padding: var(--sp-2) var(--sp-2) var(--sp-1); font-size: var(--fs-xs); color: var(--c-text-mute); }
-.lnb-link { display: flex; align-items: center; gap: var(--sp-2); width: 100%; height: var(--h-control); padding: 0 var(--sp-2); background: none; border: 0; border-radius: var(--r-control); font-size: var(--fs-s); color: var(--c-text-sub); text-align: left; }
+.lnb-link { display: flex; align-items: center; gap: var(--sp-2); width: 100%; height: var(--h-control); padding: 0 var(--sp-2); border-radius: var(--r-control); font-size: var(--fs-s); color: var(--c-text-sub); text-align: left; }
 .lnb-link:hover { background: var(--c-fill); }
 
 /* ── 하단 고정 바(모바일) ── */
-.tabbar { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1; height: var(--h-tabbar); background: var(--c-surface); border-top: var(--bw) solid var(--c-line); }
-.tabbar-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1); background: none; border: 0; font-size: var(--fs-xs); color: var(--c-text-sub); }
+.tabbar { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: var(--z-bar); height: var(--h-tabbar); background: var(--c-surface); border-top: var(--bw) solid var(--c-line); }
+.tabbar-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1); font-size: var(--fs-xs); color: var(--c-text-sub); }
 
 /* ── 탭 ── */
 .tabs { display: flex; gap: 0; border-bottom: var(--bw) solid var(--c-line); }
-.tab { height: calc(var(--h-control) + var(--sp-1)); padding: 0 var(--sp-4); background: none; border: 0; border-bottom: var(--bw-tab) solid transparent; color: var(--c-text-sub); font-size: var(--fs-s); }
+.tab { height: var(--h-tab); padding: 0 var(--sp-4); border-bottom: var(--bw-tab) solid transparent; color: var(--c-text-sub); font-size: var(--fs-s); }
 
 /* ── 버튼: 모양은 .btn 1개, 색은 primary/secondary 2종 ── */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-1); height: var(--h-control); padding: 0 var(--sp-3); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-s); font-weight: var(--fw-bold); white-space: nowrap; }
@@ -84,14 +85,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .link:focus-visible,
 .lnb-link:focus-visible,
 .g-card:focus-visible,
-.row-link:focus-visible { outline: var(--bw) solid var(--c-link); outline-offset: var(--bw); }
+.logo:focus-visible,
+.menu-btn:focus-visible,
+.tabbar-item:focus-visible,
+.cap-time:focus-visible { outline: var(--bw) solid var(--c-link); outline-offset: var(--bw); }
 .pager { justify-content: center; margin-top: var(--sp-2); }
 .pager-btn { min-width: var(--h-control); height: var(--h-control); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-s); }
 .pager-btn:disabled { color: var(--c-text-mute); background: var(--c-fill); cursor: not-allowed; }
 .check { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-s); }
 
 /* ── 칩(태그 포함) ── */
-.chip { display: inline-flex; white-space: nowrap; align-items: center; height: calc(var(--sp-4) + var(--sp-1)); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-xs); color: var(--c-text-sub); }
+.chip { display: inline-flex; white-space: nowrap; align-items: center; height: var(--h-chip); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-xs); color: var(--c-text-sub); }
 
 /* ── 카드 · 안내 · 인용 ── */
 .card { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); padding: var(--sp-4); }
@@ -102,9 +106,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-3); }
 .g-card { display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-3); background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); text-align: left; cursor: pointer; }
 .g-card:hover { border-color: var(--c-text); }
-.g-thumb { flex: none; width: var(--w-thumb); aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
-.cap { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
-.cap-time { position: absolute; top: var(--sp-2); left: var(--sp-2); padding: 0 var(--sp-2); background: var(--c-overlay); border: 0; border-radius: var(--r-control); color: var(--c-on-ink); font-size: var(--fs-xs); line-height: var(--sp-4); cursor: pointer; }
+.cap { position: relative; aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
+.cap-time { position: absolute; top: var(--sp-2); left: var(--sp-2); padding: 0 var(--sp-2); background: var(--c-overlay); border-radius: var(--r-control); color: var(--c-on-ink); font-size: var(--fs-xs); line-height: var(--sp-4); cursor: pointer; }
+.g-thumb { flex: none; width: var(--w-thumb); }
 .g-img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .g-body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
 .g-title { font-weight: var(--fw-bold); }
@@ -114,8 +118,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .row { display: flex; align-items: center; gap: var(--sp-3); min-height: var(--h-row); padding: 0 var(--sp-3); border-bottom: var(--bw) solid var(--c-line); font-size: var(--fs-s); }
 .row:last-child { border-bottom: 0; }
 .row-head { background: var(--c-fill); color: var(--c-text-sub); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
-.row-link { cursor: pointer; }
-.row-link:hover { background: var(--c-fill); }
 .c-xs { flex: none; width: var(--col-xs); }
 .c-s { flex: none; width: var(--col-s); }
 .c-m { flex: none; width: var(--col-m); }
@@ -125,9 +127,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .m-label { display: none; }
 
 /* ── 모달 · 토스트 · 진행 막대 ── */
-.modal-bg { position: fixed; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--c-overlay); }
+.modal-bg { position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--c-overlay); }
 .modal { width: 100%; max-width: var(--w-modal); padding: var(--sp-4); background: var(--c-surface); border-radius: var(--r-card); box-shadow: var(--shadow-dialog); }
-.toast { position: fixed; bottom: var(--sp-4); left: 50%; transform: translateX(-50%); z-index: 4; padding: var(--sp-2) var(--sp-3); background: var(--c-text); color: var(--c-on-ink); border-radius: var(--r-control); font-size: var(--fs-s); }
+.toast { position: fixed; bottom: var(--sp-4); left: 50%; transform: translateX(-50%); z-index: var(--z-toast); padding: var(--sp-2) var(--sp-3); background: var(--c-text); color: var(--c-on-ink); border-radius: var(--r-control); font-size: var(--fs-s); }
 
 /* ── 상태 (칩·안내·버튼 공통) ── */
 .is-info { color: var(--c-info); background: var(--c-info-bg); border-color: var(--c-info); }
