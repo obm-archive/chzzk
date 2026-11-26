@@ -1,0 +1,44 @@
+name: test-adult
+# 성인 표시 방송을 로그인 없이 받을 수 있는지 확인
+on:
+  workflow_dispatch:
+    inputs:
+      video_no:
+        description: "치지직 다시보기 번호"
+        required: true
+        default: "16335020"
+
+permissions:
+  contents: write
+
+jobs:
+  adult:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 도구 설치
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install -q -U yt-dlp
+      - name: 상세 API 조회
+        run: |
+          mkdir -p out
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36"
+          curl -s -w "\nHTTP %{http_code}\n" -A "$UA" "https://api.chzzk.naver.com/service/v2/videos/${{ inputs.video_no }}" | tee out/detail.txt | head -c 1500
+      - name: yt-dlp 정보 조회
+        run: |
+          yt-dlp -F "https://chzzk.naver.com/video/${{ inputs.video_no }}" 2>&1 | tail -15 | tee out/formats.txt || true
+      - name: 30초 다운로드 시도
+        run: |
+          yt-dlp -f "worst" --download-sections "*0-30" \
+            --downloader-args "ffmpeg_i:-allowed_extensions ALL -extension_picky 0" \
+            -o out/clip.%(ext)s "https://chzzk.naver.com/video/${{ inputs.video_no }}" 2>&1 | tail -15 | tee out/download.txt || true
+          ls -la out | tee -a out/download.txt
+      - name: 결과 저장
+        run: |
+          N=${{ github.run_number }}
+          mkdir -p results/run-$N-adult
+          cp out/*.txt results/run-$N-adult/
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add results; git commit -m "test-adult result run-$N" || true
+          git pull --rebase -q || true; git push || true
