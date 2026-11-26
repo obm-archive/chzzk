@@ -1,0 +1,11 @@
+[chzzk:video] Extracting URL: https://chzzk.naver.com/video/16335020
+[chzzk:video] 16335020: Downloading video info
+[chzzk:video] 16335020: Downloading m3u8 information
+[info] Available formats for 16335020:
+ID       EXT RESOLUTION FPS |   FILESIZE   TBR PROTO | VCODEC      ACODEC
+----------------------------------------------------------------------------
+hls-192  mp4 256x144     30 | ~779.64MiB  192k m3u8  | avc1.4D000C mp4a.40.2
+hls-696  mp4 640x360     30 | ~  2.76GiB  696k m3u8  | avc1.4D001E mp4a.40.2
+hls-1692 mp4 852x480     30 | ~  6.71GiB 1692k m3u8  | avc1.4D001F mp4a.40.2
+hls-3192 mp4 1280x720    60 | ~ 12.66GiB 3192k m3u8  | avc1.640028 mp4a.40.2
+hls-8384 mp4 1920x1080   60 | ~ 33.25GiB 8384k m3u8  | avc1.64002A mp4a.40.2
