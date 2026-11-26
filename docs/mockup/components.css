@@ -34,7 +34,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .main { flex: 1; min-width: 0; padding: var(--sp-4) var(--sp-4) var(--sp-5); }
 .auth { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--sp-3); }
 .auth-box { width: 100%; max-width: var(--w-auth); padding: var(--sp-5); background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); display: flex; flex-direction: column; gap: var(--sp-4); }
-.media { display: grid; grid-template-columns: var(--w-cap) 1fr; gap: var(--sp-4); align-items: start; }
+.media { display: grid; grid-template-columns: 2fr 3fr; gap: var(--sp-4); align-items: start; }
 .stack { display: flex; flex-direction: column; gap: var(--sp-3); }
 .inline { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 .grow { flex: 1; min-width: 0; }
@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .check { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-s); }
 
 /* ── 칩(태그 포함) ── */
-.chip { display: inline-flex; align-items: center; height: calc(var(--sp-4) + var(--sp-1)); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-xs); color: var(--c-text-sub); }
+.chip { display: inline-flex; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; align-items: center; height: calc(var(--sp-4) + var(--sp-1)); padding: 0 var(--sp-2); background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-control); font-size: var(--fs-xs); color: var(--c-text-sub); }
 
 /* ── 카드 · 안내 · 인용 ── */
 .card { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); padding: var(--sp-4); }
@@ -99,7 +99,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .g-card { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3); background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); text-align: left; cursor: pointer; }
 .g-card:hover { border-color: var(--c-text); }
 .g-thumb { flex: none; width: var(--w-thumb); aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
-.cap { position: relative; width: 100%; max-width: var(--w-cap); aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
+.cap { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--c-fill); border-radius: var(--r-control); overflow: hidden; }
 .cap-time { position: absolute; top: var(--sp-2); left: var(--sp-2); padding: 0 var(--sp-2); background: var(--c-overlay); border: 0; border-radius: var(--r-control); color: var(--c-on-ink); font-size: var(--fs-xs); line-height: var(--sp-4); cursor: pointer; }
 .g-img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .g-body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
@@ -117,7 +117,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .c-m { flex: none; width: var(--col-m); }
 .c-l { flex: none; width: var(--col-l); }
 .c-b { flex: none; width: var(--col-b); }
-.c-act { flex: none; width: var(--col-l); display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-2); }
+.c-act { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-2); }
 .c-fill { flex: 1; min-width: 0; }
 .line { display: contents; }
 .m-label { display: none; }
@@ -138,9 +138,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .hit { border-color: var(--c-text); }
 
 /* ── 모바일 ── */
-@media (max-width: 640px) {
+/* 중단점: 1024px 이하 = 왼쪽 메뉴를 햄버거로, 800px 이하 = 방송 목록 1열, 640px 이하 = 모바일 */
+@media (max-width: 1024px) {
   .lnb { display: none; }
   .menu-btn { display: flex; }
+}
+
+@media (max-width: 800px) {
+  .gallery { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
   .tabbar { display: flex; }
   .main { padding: var(--sp-3) var(--sp-3) calc(var(--h-tabbar) + var(--sp-4)); }
   .c-hide { display: none; }

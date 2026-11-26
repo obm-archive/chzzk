@@ -349,8 +349,8 @@
           '<span class="c-fill"></span><span class="c-act">' + rbtn('승인', 'm-approve', m.id, 'btn-primary') + rbtn('거절', 'm-reject', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'ok') {
-        row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="' + m.id + '"' + (state.sel[m.id] ? ' checked' : '') + '></label></span>' + nick) +
-          line('<span class="c-s c-hide">' + esc(m.joined) + '</span><span class="c-l nowrap m-end">' + ml('최근 접속') + esc(m.seen) + ' <span class="mute">(' + daysAgo(m.seen) + '일 전)</span></span>') +
+        row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="' + m.id + '"' + (state.sel[m.id] ? ' checked' : '') + '></label></span>' + nick + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
+          line(ml('최근 접속') + '<span class="c-l nowrap m-end">' + esc(m.seen) + ' <span class="mute">(' + daysAgo(m.seen) + '일 전)</span></span>') +
           '<span class="c-fill"></span><span class="c-act">' + rbtn('탈퇴', 'withdraw', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'out') {
