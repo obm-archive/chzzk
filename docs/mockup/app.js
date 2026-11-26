@@ -6,6 +6,7 @@
   var TODAY = '2026-11-26';
   var CATEGORY = { talk: '토크' };
   var M = window.MOCK;
+  var TERM_TYPES = ['닉네임', '밈·유행어', '인물', '게임 용어', '기타'];
   var DETAIL_NO = M.post.video_no;
 
   var MENU = [
@@ -49,11 +50,10 @@
   ];
 
   var state = {
-    form: { nick: '', pw: '', grade: '', link: '', q: '', from: '', to: '', cat: '', tname: '', tdesc: '' },
+    form: { nick: '', pw: '', grade: '', link: '', q: '', from: '', to: '', cat: '', tname: '', ttype: '닉네임', tdesc: '' },
     err: '', modal: null, menu: false, sel: {}, idle: 0, toastTimer: null,
     gloss: M.glossary.map(function (g, i) {
-      return { id: i + 1, term: g.term, type: g.type, desc: g.desc, author: i % 3 === 0 ? '나' : '회원' + (10 + i),
-        hist: [{ at: '2026-11-25', who: i % 3 === 0 ? '나' : '회원' + (10 + i), desc: g.desc }] };
+      return { id: i + 1, term: g.term, type: g.type, desc: g.desc, author: i % 3 === 0 ? '나' : '회원' + (10 + i) };
     }),
     members: [
       { id: 1, nick: '신청자01', st: 'pending', joined: '2026-11-25', seen: '', grade: '예', link: '게시물 보기' },
@@ -228,12 +228,13 @@
     var f = state.form;
     var searched = !!(q.q || q.from || q.to || q.cat);
     var h = '<h1 class="title">검색</h1><div class="card stack">' +
-      '<div class="field"><label class="label">키워드</label><input class="input" data-f="q" value="' + val('q') + '" placeholder="이 얘기 언제 했더라? (예: 캠핑장)"></div>' +
       '<div class="inline"><div class="field grow"><label class="label">시작일</label><input class="input" type="date" data-f="from" value="' + val('from') + '"></div>' +
       '<div class="field grow"><label class="label">종료일</label><input class="input" type="date" data-f="to" value="' + val('to') + '"></div>' +
       '<div class="field grow"><label class="label">카테고리</label><select class="input" data-f="cat"><option value="">전체</option>' +
       categories().map(function (c) { return '<option value="' + esc(c) + '"' + (f.cat === c ? ' selected' : '') + '>' + esc(catLabel(c)) + '</option>'; }).join('') +
-      '</select></div></div><div class="inline">' + btn('검색', 'search', '', 'btn-primary') + '</div></div>';
+      '</select></div></div>' +
+      '<div class="field"><label class="label">키워드</label><input class="input" data-f="q" value="' + val('q') + '"></div>' +
+      '<div class="inline">' + btn('검색', 'search', '', 'btn-primary') + '</div></div>';
     if (searched) {
       var hits = [];
       M.posts.forEach(function (p) {
@@ -268,15 +269,15 @@
     h += '<div class="inline"><span class="chip">' + esc(catLabel(p.cat)) + '</span><span class="small sub">' + esc(p.date.slice(0, 16)) + ' · ' + dur(p.dur) + '</span></div>';
     if (r === 'admin') h += '<div class="inline">' + btn('숨김', 'post-hide') + btn('재처리', 'post-redo') + '</div>';
     if (p.no !== DETAIL_NO) return shell('', r, h + '<div class="notice is-warn">아직 요약 처리 전인 방송입니다.</div>');
-    h += '<div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div>';
-    h += '<div class="h2">연결된 방송</div><div class="list">' + LINKED.map(function (x) {
-      return '<div class="row"><span class="c-s bold">' + esc(x.label) + '</span><span class="c-fill clip">chzzk.naver.com/video/' + x.no + '</span><span class="c-m c-hide">' + dur(x.dur) +
+    var side = '<div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div>';
+    side += '<div class="list">' + LINKED.map(function (x) {
+      return '<div class="row"><span class="c-s bold">' + esc(x.label) + '</span><span class="c-fill sub">' + dur(x.dur) +
         '</span><span class="c-b"><a class="link" href="https://chzzk.naver.com/video/' + x.no + '" target="_blank" rel="noopener">치지직에서 보기</a></span></div>';
     }).join('') + '</div>';
-    h += '<div class="card stack"><div class="h2">전체 요약</div><p>' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div>';
-    h += '<div class="h2">구간별 요약</div>';
+    side += '<div class="card stack"><div class="h2">전체 요약</div><p class="small">' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div>';
+    var segs = '<div class="h2">구간별 요약</div>';
     M.segments.forEach(function (s, i) {
-      h += '<div class="card stack' + (focus === i ? ' hit' : '') + '">' +
+      segs += '<div class="card stack' + (focus === i ? ' hit' : '') + '">' +
         '<div class="inline"><button class="link" data-act="seek" data-v="' + esc(s.start) + '">' + esc(s.start) + ' – ' + esc(s.end) + '</button></div>' +
         '<div class="cap"></div>' +
         s.quotes.map(function (x) {
@@ -285,6 +286,7 @@
         '<div class="bold">' + esc(s.title) + '</div><p class="small sub">' + esc(s.summary) + '</p>' +
         '<div class="inline">' + chips(s.keywords) + '</div></div>';
     });
+    h += '<div class="split"><div class="stack">' + segs + '</div><div class="aside">' + side + '</div></div>';
     return shell('', r, h);
   }
 
@@ -310,7 +312,6 @@
       var own = g.author === '나';
       var acts = '';
       if (own || admin) acts += btn('수정', 'term-edit', 'data-id="' + g.id + '"') + btn('삭제', 'term-del', 'data-id="' + g.id + '"');
-      if (admin) acts += btn('이력', 'term-hist', 'data-id="' + g.id + '"');
       h += '<div class="row"><span class="c-m bold clip">' + esc(g.term) + '</span><span class="c-s"><span class="chip">' + esc(g.type) +
         '</span></span><span class="c-fill clip">' + esc(g.desc) + '</span><span class="c-s c-hide">' + esc(g.author) +
         '</span><span class="c-l inline">' + acts + '</span></div>';
@@ -354,7 +355,7 @@
 
   /* ── 화면: 처리 현황 ── */
   function vOps() {
-    var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">연령 제한 방송 수집에 쓰는 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
+    var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">네이버 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
     h += '<div class="list"><div class="row row-head"><span class="c-m">방송 번호</span><span class="c-fill">제목</span><span class="c-m c-hide">시작</span><span class="c-m">상태</span><span class="c-l"></span></div>';
     state.ops.forEach(function (o) {
       h += '<div class="row"><span class="c-m">' + o.no + '</span><span class="c-fill clip">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(5, 16)) + '</span><span class="c-m">' +
@@ -372,19 +373,13 @@
     if (m.kind === 'term') {
       body = '<div class="h2">' + (m.id ? '용어 수정' : '용어 추가') + '</div>' +
         '<div class="field"><label class="label">용어 (30자 이내)</label><input class="input" maxlength="30" data-f="tname" value="' + val('tname') + '"></div>' +
+        '<div class="field"><label class="label">분류</label><select class="input" data-f="ttype">' + TERM_TYPES.map(function (x) { return '<option' + (state.form.ttype === x ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '</select></div>' +
         '<div class="field"><label class="label">설명 (200자 이내)</label><textarea class="textarea" maxlength="200" data-f="tdesc">' + val('tdesc') + '</textarea></div>' +
         (state.err ? '<div class="notice is-danger">' + esc(state.err) + '</div>' : '') +
         '<div class="inline">' + btn('취소', 'modal-close') + '<span class="grow"></span>' + btn('저장', 'term-save', '', 'btn-primary') + '</div>';
     }
     if (m.kind === 'confirm') {
       body = '<div class="h2">탈퇴 처리</div><p>' + esc(m.text) + '</p><div class="inline">' + btn('취소', 'modal-close') + '<span class="grow"></span>' + btn('탈퇴', 'confirm-yes', '', 'btn-secondary is-danger') + '</div>';
-    }
-    if (m.kind === 'hist') {
-      var g = state.gloss.filter(function (x) { return x.id === m.id; })[0];
-      body = '<div class="h2">' + esc(g.term) + ' 변경 이력</div><div class="list">' + g.hist.slice().reverse().map(function (x, i) {
-        return '<div class="row"><span class="c-m">' + esc(x.at) + '</span><span class="c-fill clip">' + esc(x.who) + ' · ' + esc(x.desc) + '</span>' +
-          (i > 0 ? '<span class="c-b">' + btn('되돌리기', 'term-revert', 'data-id="' + g.id + '" data-v="' + (g.hist.length - 1 - i) + '"') + '</span>' : '') + '</div>';
-      }).join('') + '</div><div class="inline"><span class="grow"></span>' + btn('닫기', 'modal-close') + '</div>';
     }
     return '<div class="modal-bg"><div class="modal stack">' + body + '</div></div>';
   }
@@ -437,10 +432,10 @@
     'post-hide': function () { toast('숨김 처리했습니다'); },
     'post-redo': function () { toast('재처리를 요청했습니다'); },
     'post-split': function () { toast('병합·분할 화면으로 이동'); },
-    'term-add': function () { state.form.tname = ''; state.form.tdesc = ''; state.err = ''; state.modal = { kind: 'term', id: 0 }; render(); },
+    'term-add': function () { state.form.tname = ''; state.form.ttype = TERM_TYPES[0]; state.form.tdesc = ''; state.err = ''; state.modal = { kind: 'term', id: 0 }; render(); },
     'term-edit': function (el) {
       var g = findG(el.getAttribute('data-id'));
-      state.form.tname = g.term; state.form.tdesc = g.desc; state.err = '';
+      state.form.tname = g.term; state.form.ttype = g.type; state.form.tdesc = g.desc; state.err = '';
       state.modal = { kind: 'term', id: g.id }; render();
     },
     'term-save': function () {
@@ -448,10 +443,9 @@
       if (!f.tname.trim() || !f.tdesc.trim()) { state.err = '용어와 설명을 입력해 주세요.'; render(); return; }
       if (state.modal.id) {
         var g = findG(state.modal.id);
-        g.term = f.tname.trim(); g.desc = f.tdesc.trim();
-        g.hist.push({ at: TODAY, who: '나', desc: g.desc });
+        g.term = f.tname.trim(); g.type = f.ttype; g.desc = f.tdesc.trim();
       } else {
-        state.gloss.unshift({ id: Date.now(), term: f.tname.trim(), type: '기타', desc: f.tdesc.trim(), author: '나', hist: [{ at: TODAY, who: '나', desc: f.tdesc.trim() }] });
+        state.gloss.unshift({ id: Date.now(), term: f.tname.trim(), type: f.ttype, desc: f.tdesc.trim(), author: '나' });
       }
       state.modal = null; state.err = ''; render(); toast('저장했습니다');
     },
@@ -459,13 +453,6 @@
       var id = +el.getAttribute('data-id');
       state.gloss = state.gloss.filter(function (g) { return g.id !== id; });
       render(); toast('삭제했습니다');
-    },
-    'term-hist': function (el) { state.modal = { kind: 'hist', id: +el.getAttribute('data-id') }; render(); },
-    'term-revert': function (el) {
-      var g = findG(el.getAttribute('data-id'));
-      var h = g.hist[+el.getAttribute('data-v')];
-      g.desc = h.desc; g.hist.push({ at: TODAY, who: '관리자', desc: h.desc });
-      state.modal = null; render(); toast('되돌렸습니다');
     },
     'modal-close': function () { state.modal = null; state.err = ''; render(); },
     'm-approve': function (el) { setMember(el.getAttribute('data-id'), 'ok'); render(); toast('승인했습니다'); },

@@ -47,21 +47,22 @@
 
   /* 컨트롤 높이, 아이콘 크기 */
   --h-control: 40px;
-  --h-row: 48px;
+  --h-row: 64px;
   --icon: 20px;
 
   /* 목록 열 너비 6종 */
-  --col-xs: 48px;
-  --col-s: 80px;
-  --col-m: 120px;
-  --col-l: 200px;
-  --col-b: 96px;
+  --col-xs: 56px;
+  --col-s: 120px;
+  --col-m: 160px;
+  --col-l: 240px;
+  --col-b: 120px;
 
   /* 레이아웃 */
   --w-lnb: 220px;
   --w-card: 260px;
   --w-auth: 480px;
   --w-cap: 400px;
+  --w-aside: 420px;
   --w-modal: 440px;
   --bp-mobile: 640px;
   --h-header: 56px;

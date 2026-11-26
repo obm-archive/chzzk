@@ -47,7 +47,7 @@ click($$('[data-act="menu-open"]')[0]);ok(!!$('.drawer'),'hamburger opens drawer
 nav('home?r=user');ok(!txt().includes('멤버 관리'),'user: no admin menu');
 nav('home?r=admin');ok(txt().includes('멤버 관리')&&txt().includes('처리 현황'),'admin: extra menu in same screen');
 // 검색
-nav('search?r=user');ok(!!$('[data-f="from"]')&&!!$('[data-f="to"]')&&!!$('[data-f="cat"]'),'search: keyword + date range + category');
+nav('search?r=user');ok($('[data-f="q"]').placeholder===''&&($('[data-f="from"]').compareDocumentPosition($('[data-f="q"]'))&4)!==0,'search: keyword below dates, no placeholder');ok(!!$('[data-f="from"]')&&!!$('[data-f="to"]')&&!!$('[data-f="cat"]'),'search: keyword + date range + category');
 setf('q','캠핑장');click(byAct('search'));settle();ok(txt().includes('검색 결과')&&$$('.g-card').length>0,'search hits as gallery');
 nav('search?r=user&q=없는검색어');ok(txt().includes('검색 결과가 없습니다'),'no result state');
 nav('search?r=user&from=2026-11-20&to=2026-11-26&cat=talk');const dn=$$('.g-card').length;ok(dn>0&&dn<12,'date+category filter ('+dn+')');
@@ -58,17 +58,16 @@ nav('members?r=admin&t=ok');ok($$('.tabs .tab').length===3,'members tabs');
 nav('me?r=user');ok(txt().includes('내 정보')&&txt().includes('로그아웃'),'me screen');
 nav('post?r=user&no=16268684');ok(txt().includes('요약 처리 전'),'unprocessed post notice');
 // 상세
-nav('post?r=user&seg=2');ok(!!$('.hit'),'focus exists');ok($$('.card.hit').length===1,'one focused segment');ok(!txt().includes('재처리'),'user detail: no admin buttons');
+nav('post?r=user&seg=2');ok(!!$('.split')&&!!$('.aside'),'detail split layout');ok(!!$('.hit'),'focus exists');ok($$('.card.hit').length===1,'one focused segment');ok(!txt().includes('재처리'),'user detail: no admin buttons');
 click(byAct('seek'));ok(!!$('#toast'),'timestamp toast');
 nav('post?r=admin');ok(txt().includes('재처리'),'admin detail: extra buttons');
 // 용어집
 nav('glossary?r=user');const rows=$$('.row').length;const ownEdit=$$('[data-act="term-edit"]').length;
-nav('glossary?r=admin');ok($$('[data-act="term-edit"]').length>ownEdit&&$$('[data-act="term-hist"]').length>0,'admin sees all edit + history');
+nav('glossary?r=admin');ok($$('[data-act="term-edit"]').length>ownEdit&&$$('[data-act="term-hist"]').length===0,'admin sees all edit, no history');
 click(byAct('term-add'));ok(!!$('.modal'),'term modal opens');
 ok($('[data-f="tname"]').getAttribute('maxlength')==='30'&&$('[data-f="tdesc"]').getAttribute('maxlength')==='200','limits 30/200');
-click(byAct('term-save'));ok(txt().includes('입력해 주세요'),'term validation');
+ok(!!$('[data-f="ttype"]'),'term modal has category select');click(byAct('term-save'));ok(txt().includes('입력해 주세요'),'term validation');
 setf('tname','새용어');setf('tdesc','설명');click(byAct('term-save'));ok(txt().includes('새용어')&&!$('.modal'),'term added');
-click(byAct('term-hist'));ok(!!$('.modal'),'history modal');click(byAct('modal-close'));
 // 멤버
 nav('members?r=admin&t=pending');ok($$('[data-act="m-approve"]').length===3,'pending 3');
 click(byAct('m-approve'));ok($$('[data-act="m-approve"]').length===2,'approve moves member');
