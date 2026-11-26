@@ -1,0 +1,9 @@
+[chzzk:video] Extracting URL: https://chzzk.naver.com/video/16335020
+[chzzk:video] 16335020: Downloading video info
+ERROR: the JSON object must be str, bytes or bytearray, not NoneType
+total 20
+drwxr-xr-x 2 runner runner 4096 Nov 26 04:08 .
+drwxr-xr-x 9 runner runner 4096 Nov 26 04:08 ..
+-rw-r--r-- 1 runner runner 3531 Nov 26 04:08 detail.txt
+-rw-r--r-- 1 runner runner  185 Nov 26 04:08 download.txt
+-rw-r--r-- 1 runner runner  185 Nov 26 04:08 formats.txt

@@ -1,0 +1,3 @@
+[chzzk:video] Extracting URL: https://chzzk.naver.com/video/16335020
+[chzzk:video] 16335020: Downloading video info
+ERROR: the JSON object must be str, bytes or bytearray, not NoneType
