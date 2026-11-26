@@ -102,6 +102,9 @@
   function btn(label, act, extra, kind) {
     return '<button class="btn ' + (kind || 'btn-secondary') + '" data-act="' + act + '" ' + (extra || '') + '>' + esc(label) + '</button>';
   }
+  function lnk(label, act, id, danger) {
+    return '<button class="' + (danger ? 'link-danger' : 'link') + '" data-act="' + act + '" data-id="' + id + '">' + esc(label) + '</button>';
+  }
   function chips(list) {
     return list.map(function (k) { return '<span class="chip">' + esc(k) + '</span>'; }).join('');
   }
@@ -272,7 +275,7 @@
     h += '<div class="media"><div class="cap">' + (p.thumb ? '<img class="g-img" src="' + esc(p.thumb) + '" alt="">' : '') + '</div>' +
       '<div class="card stack"><div class="h2">전체 요약</div><p>' + esc(M.post.summary) + '</p><div class="inline">' + chips(M.post.keywords) + '</div></div></div>';
     h += '<div class="h2">연결된 방송</div><div class="list">' + LINKED.map(function (x) {
-      return '<div class="row"><span class="c-s bold">' + esc(x.label) + '</span><span class="c-m sub">' + dur(x.dur) +
+      return '<div class="row"><span class="c-m bold">' + esc(x.label) + '</span><span class="c-s sub nowrap">' + dur(x.dur) +
         '</span><span class="c-b end"><a class="link" href="https://chzzk.naver.com/video/' + x.no + '" target="_blank" rel="noopener">치지직에서 보기</a></span></div>';
     }).join('') + '</div>';
     h += '<div class="h2">구간별 요약</div>';
@@ -305,14 +308,14 @@
     var admin = r === 'admin';
     var h = '<div class="inline"><h1 class="title grow">용어집</h1>' + btn('용어 추가', 'term-add', '', 'btn-primary') + '</div>';
     h += '<div class="list"><div class="row row-head"><span class="c-m">용어</span><span class="c-s">분류</span><span class="c-fill">설명</span>' +
-      '<span class="c-s c-hide">작성자</span><span class="c-l"></span></div>';
+      '<span class="c-s c-hide">작성자</span><span class="c-act"></span></div>';
     state.gloss.forEach(function (g) {
       var own = g.author === '나';
       var acts = '';
-      if (own || admin) acts += btn('수정', 'term-edit', 'data-id="' + g.id + '"') + btn('삭제', 'term-del', 'data-id="' + g.id + '"');
+      if (own || admin) acts += lnk('수정', 'term-edit', g.id) + lnk('삭제', 'term-del', g.id, true);
       h += '<div class="row"><span class="c-m bold clip">' + esc(g.term) + '</span><span class="c-s"><span class="chip">' + esc(g.type) +
         '</span></span><span class="c-fill clip">' + esc(g.desc) + '</span><span class="c-s c-hide">' + esc(g.author) +
-        '</span><span class="c-l inline">' + acts + '</span></div>';
+        '</span><span class="c-act">' + acts + '</span></div>';
     });
     return shell('glossary', r, h + '</div>');
   }
@@ -333,20 +336,20 @@
     if (t === 'ok') h += '<div class="inline"><span class="small sub grow">' + list.length + '명 · 선택 ' + picked + '명</span>' + btn('선택 탈퇴', 'withdraw-bulk', picked ? '' : 'disabled', 'btn-secondary is-danger') + '</div>';
     h += '<div class="list"><div class="row row-head">' + (t === 'ok' ? '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span>' : '') +
       '<span class="c-m">닉네임</span><span class="c-s">가입일</span>' +
-      (t === 'ok' ? '<span class="c-m">최근 접속</span>' : '') +
+      (t === 'ok' ? '<span class="c-l">최근 접속</span>' : '') +
       (t === 'pending' ? '<span class="c-s">등급 답변</span><span class="c-fill">최근 게시물</span>' : '<span class="c-fill"></span>') +
-      '<span class="c-l"></span></div>';
+      '<span class="c-act"></span></div>';
     if (!list.length) h += '<div class="row mute">해당하는 멤버가 없습니다.</div>';
     list.forEach(function (m) {
       var acts = '';
-      if (m.st === 'pending') acts = btn('승인', 'm-approve', 'data-id="' + m.id + '"', 'btn-primary') + btn('거절', 'm-reject', 'data-id="' + m.id + '"');
-      if (m.st === 'ok') acts = btn('탈퇴', 'withdraw', 'data-id="' + m.id + '"', 'btn-secondary is-danger');
+      if (m.st === 'pending') acts = lnk('승인', 'm-approve', m.id) + lnk('거절', 'm-reject', m.id, true);
+      if (m.st === 'ok') acts = lnk('탈퇴', 'withdraw', m.id, true);
       if (m.st === 'out') acts = '<span class="chip">' + esc(m.why) + '</span>';
       h += '<div class="row">' + (t === 'ok' ? '<span class="c-xs"><label class="check"><input type="checkbox" data-sel="' + m.id + '"' + (state.sel[m.id] ? ' checked' : '') + '></label></span>' : '') +
         '<span class="c-m bold clip">' + esc(m.nick) + '</span><span class="c-s">' + esc(m.joined.slice(5)) + '</span>' +
-        (t === 'ok' ? '<span class="c-m">' + esc(m.seen) + ' <span class="mute">(' + daysAgo(m.seen) + '일 전)</span></span>' : '') +
+        (t === 'ok' ? '<span class="c-l nowrap">' + esc(m.seen) + ' <span class="mute">(' + daysAgo(m.seen) + '일 전)</span></span>' : '') +
         (t === 'pending' ? '<span class="c-s">' + esc(m.grade) + '</span><span class="c-fill"><button class="link" data-act="seek" data-v="게시물">' + esc(m.link) + '</button></span>' : '<span class="c-fill"></span>') +
-        '<span class="c-l inline">' + acts + '</span></div>';
+        '<span class="c-act">' + acts + '</span></div>';
     });
     return shell('members', 'admin', h + '</div>');
   }
@@ -354,11 +357,11 @@
   /* ── 화면: 처리 현황 ── */
   function vOps() {
     var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">네이버 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
-    h += '<div class="list"><div class="row row-head"><span class="c-m">방송 번호</span><span class="c-fill">제목</span><span class="c-m c-hide">시작</span><span class="c-m">상태</span><span class="c-l"></span></div>';
+    h += '<div class="list"><div class="row row-head"><span class="c-m">방송 번호</span><span class="c-fill">제목</span><span class="c-m c-hide">시작</span><span class="c-s">상태</span><span class="c-act"></span></div>';
     state.ops.forEach(function (o) {
-      h += '<div class="row"><span class="c-m">' + o.no + '</span><span class="c-fill clip">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(5, 16)) + '</span><span class="c-m">' +
+      h += '<div class="row"><span class="c-m">' + o.no + '</span><span class="c-fill clip">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(5, 16)) + '</span><span class="c-s">' +
         (o.st === '처리 중' ? '<progress class="progress" value="' + o.pct + '" max="100"></progress>' : '<span class="chip ' + o.cls + '">' + o.st + '</span>') +
-        '</span><span class="c-l inline">' + btn('재처리', 'post-redo') + btn('병합·분할', 'post-split') + '</span></div>';
+        '</span><span class="c-act">' + lnk('재처리', 'post-redo', o.no) + lnk('병합·분할', 'post-split', o.no) + '</span></div>';
     });
     return shell('ops', 'admin', h + '</div>');
   }

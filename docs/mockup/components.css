@@ -27,6 +27,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .mute { color: var(--c-text-mute); }
 .link { background: none; border: 0; color: var(--c-link); cursor: pointer; padding: 0; text-decoration: none; }
 .link:hover { text-decoration: underline; }
+.link-danger { background: none; border: 0; color: var(--c-danger); cursor: pointer; padding: 0; }
+.link-danger:hover { text-decoration: underline; }
 .icon { flex: none; width: var(--icon); height: var(--icon); }
 
 /* ── 배치 ── */
@@ -81,6 +83,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .chip:focus-visible,
 .tab:focus-visible,
 .link:focus-visible,
+.link-danger:focus-visible,
 .lnb-link:focus-visible,
 .g-card:focus-visible,
 .row-link:focus-visible { outline: var(--bw) solid var(--c-link); outline-offset: var(--bw); }
@@ -117,6 +120,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .c-m { flex: none; width: var(--col-m); }
 .c-l { flex: none; width: var(--col-l); }
 .c-b { flex: none; width: var(--col-b); }
+.c-act { flex: none; width: var(--col-l); display: flex; align-items: center; gap: var(--sp-3); }
 .c-fill { flex: 1; min-width: 0; }
 .clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -124,7 +128,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .modal-bg { position: fixed; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--c-overlay); }
 .modal { width: 100%; max-width: var(--w-modal); padding: var(--sp-4); background: var(--c-surface); border-radius: var(--r-card); box-shadow: var(--shadow-dialog); }
 .toast { position: fixed; bottom: var(--sp-4); left: 50%; transform: translateX(-50%); z-index: 4; padding: var(--sp-2) var(--sp-3); background: var(--c-text); color: var(--c-on-ink); border-radius: var(--r-control); font-size: var(--fs-s); }
-.progress { width: 100%; height: var(--sp-1); appearance: none; border: 0; border-radius: var(--r-control); background: var(--c-fill); overflow: hidden; }
+.progress { width: 100%; min-width: var(--col-s); height: var(--sp-1); appearance: none; border: 0; border-radius: var(--r-control); background: var(--c-fill); overflow: hidden; }
 .progress::-webkit-progress-bar { background: var(--c-fill); }
 .progress::-webkit-progress-value { background: var(--c-text); }
 .progress::-moz-progress-bar { background: var(--c-text); }
@@ -151,12 +155,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .row { padding-left: 0; padding-right: 0; }
   .auth-box { padding: var(--sp-3); border: 0; background: transparent; }
   .row { flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
-  .c-xs, .c-s, .c-b { width: auto; }
+  .c-xs { width: auto; }
+  .c-s, .c-b, .c-l { width: auto; order: 1; }
   .c-m { flex: 1; width: auto; }
+  .c-act { width: auto; }
   .c-fill { order: 1; flex-basis: 100%; }
   .c-fill:empty { display: none; }
-  .c-l { order: 2; width: 100%; }
-  .c-l:empty { display: none; }
+  .c-act:empty { display: none; }
   .clip { white-space: normal; }
   .row-head { display: none; }
   .gallery { grid-template-columns: 1fr; gap: 0; }
