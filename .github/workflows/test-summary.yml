@@ -31,7 +31,7 @@ jobs:
       VOD_URL: ${{ inputs.url }}
       START_MIN: ${{ inputs.start_min }}
       MINUTES: ${{ inputs.minutes }}
-      SUMMARY_API: ${{ secrets.SUMMARY_API }}
+      GEMINI_API: ${{ secrets.GEMINI_API }}
       FRAME_INTERVAL: "60"
     steps:
       - uses: actions/checkout@v4

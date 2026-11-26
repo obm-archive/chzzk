@@ -15,6 +15,7 @@ from google import genai
 from google.genai import types
 
 DEFAULT_MODELS = ["gemini-2.5-flash"]
+USAGE = []  # token usage per successful call
 
 
 def fmt(sec: int) -> str:
@@ -23,9 +24,9 @@ def fmt(sec: int) -> str:
 
 
 def get_client() -> genai.Client:
-    key = os.environ.get("SUMMARY_API", "").strip()
+    key = (os.environ.get("GEMINI_API") or os.environ.get("SUMMARY_API") or "").strip()
     if not key:
-        print("ERROR: SUMMARY_API secret is empty or not registered as a repository secret.")
+        print("ERROR: GEMINI_API secret is empty or not registered as a repository secret.")
         sys.exit(1)
     print(f"API key loaded (length={len(key)}).")
     return genai.Client(api_key=key)
@@ -68,6 +69,15 @@ def generate(client, contents, config=None):
                     resp = client.models.generate_content(
                         model=model, contents=contents, config=config
                     )
+                    um = getattr(resp, "usage_metadata", None)
+                    if um:
+                        USAGE.append({
+                            "model": model,
+                            "prompt": getattr(um, "prompt_token_count", None),
+                            "output": getattr(um, "candidates_token_count", None),
+                            "thoughts": getattr(um, "thoughts_token_count", None),
+                            "total": getattr(um, "total_token_count", None),
+                        })
                     return model, resp.text
                 except Exception as e:  # noqa: BLE001
                     msg = str(e)
