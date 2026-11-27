@@ -107,7 +107,7 @@
   function introView(r) {
     var items = G.intro.map(function (s, i) { return { id: 's' + i, label: s.title, img: 'intro-home', blocks: s.blocks }; });
     var open = r.tab === '_' ? '' : (items.filter(function (i) { return i.id === r.tab; })[0] || items[0]).id;
-    return '<div class="doc"><div class="doc-top doc-solo"><h1 class="title">소개</h1></div>' +
+    return '<div class="doc"><div class="doc-top"><h1 class="title">소개</h1><div class="tabs tabs-end"><button class="tab on" data-go="intro">개요</button></div></div>' +
       pane('intro-home', '<div class="bar">목차</div><div class="scroll">' + accordion(items, open, 'intro') + '</div>') + '</div>';
   }
   function pageView(r) {
