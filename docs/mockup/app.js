@@ -367,7 +367,7 @@
     var head = '';
     if (t === 'pending') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-s">등급 답변</span><span class="c-s">최근 게시물</span><span class="c-act">관리</span>';
     if (t === 'ok') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-m">최근 접속</span><span class="c-act">관리</span>';
-    if (t === 'out') head = '<span class="c-fill">닉네임</span><span class="c-s">상태</span><span class="c-s">가입일</span><span class="c-s">처리일</span>';
+    if (t === 'out') head = '<span class="c-s">상태</span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-s">처리일</span>';
     h += '<div class="list"><div class="row row-head">' + head + '</div>';
     if (!list.length) h += '<div class="row mute">해당하는 멤버가 없습니다.</div>';
     pg.items.forEach(function (m) {
@@ -385,7 +385,7 @@
           '<span class="c-act">' + rbtn('탈퇴', 'withdraw', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'out') {
-        row = line(nick + '<span class="c-s m-end"><span class="chip">' + esc(m.why) + '</span></span>') +
+        row = line('<span class="c-s"><span class="chip">' + esc(m.why) + '</span></span>' + nick) +
           line(ml('가입일') + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
           line(ml('처리일') + '<span class="c-s m-end">' + esc(m.done) + '</span>');
       }
