@@ -88,30 +88,26 @@
     }).join('') + '</div>';
   }
 
-  function zoomWidth() {
-    var z = ZOOM[state.zoom] / 100, base = state.dev === 'pc' ? '100%' : state.dev === 'tab' ? 'min(var(--w-ui-tab), 100%)' : 'var(--w-ui-mo)';
-    return ' style="width:calc(' + base + ' * ' + z + ')"';
-  }
-  function picture(img, cls, style) {
-    return '<img class="ui-img ' + cls + ' ui-' + state.dev + '"' + (style || '') + ' src="img/' + img + '-' + state.dev + '.webp" alt="' + esc(img) + '">';
+  function picture(img, cls) {
+    return '<img class="ui-img' + (cls ? ' ' + cls : '') + ' ui-' + state.dev + '" src="img/' + img + '-' + state.dev + '.webp" alt="' + esc(img) + '">';
   }
   function accordion(items, open, base) {
     return items.map(function (it) {
       var on = it.id === open;
       return '<div class="acc"><button class="acc-head' + (on ? ' acc-open' : '') + '" data-go="' + base + '/' + (on ? '_' : it.id) + '"><span class="acc-mark">' + (on ? '−' : '+') + '</span><span class="grow">' + esc(it.label) + '</span></button>' +
-        (on ? '<div class="acc-body flow">' + picture(it.img, 'ui-inline') + sections(it.blocks) + '</div>' : '') + '</div>';
+        (on ? '<div class="acc-body pad flow">' + picture(it.img, 'ui-inline') + sections(it.blocks) + '</div>' : '') + '</div>';
     }).join('');
   }
   function pane(img, body) {
     return '<div class="pane">' +
-      '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main', zoomWidth()) + '</div>' +
+      '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad zoom-' + ZOOM[state.zoom] + '">' + picture(img, '') + '</div>' +
       '<div class="foot"><button class="chip" data-zoom="-1"' + (state.zoom === 0 ? ' disabled' : '') + ' aria-label="축소">−</button><span class="zoom-val">' + ZOOM[state.zoom] + '%</span><button class="chip" data-zoom="1"' + (state.zoom === ZOOM.length - 1 ? ' disabled' : '') + ' aria-label="확대">+</button></div></div>' +
       '<div class="panel">' + body + '</div></div>';
   }
   function introView(r) {
     var items = G.intro.map(function (s, i) { return { id: 's' + i, label: s.title, img: 'intro-home', blocks: s.blocks }; });
     var open = r.tab === '_' ? '' : (items.filter(function (i) { return i.id === r.tab; })[0] || items[0]).id;
-    return '<div class="doc"><div class="doc-top"><h1 class="title">소개</h1></div>' +
+    return '<div class="doc"><div class="doc-top doc-solo"><h1 class="title">소개</h1></div>' +
       pane('intro-home', '<div class="bar">목차</div><div class="scroll">' + accordion(items, open, 'intro') + '</div>') + '</div>';
   }
   function pageView(r) {

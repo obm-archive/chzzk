@@ -2,7 +2,7 @@
 
 규칙
 - tokens.css 밖에서는 색(#hex, rgb/hsl), 픽셀 값(예: 12px)을 쓰지 않는다 (@media 분기점은 예외).
-- 화면 코드(app.js, index.html)에는 style 속성이나 .style 조작, 색 값을 쓰지 않는다.
+- 화면 코드(mockup의 app.js·index.html, guide의 guide.js·pending 등)에는 style 속성이나 .style 조작, 색 값을 쓰지 않는다.
 - components.css가 쓰는 var(--...)는 모두 tokens.css에 정의되어 있어야 한다.
 - components.css 선택자는 클래스 1개(+상태 의사클래스)만: 하위·자식·인접 선택자, !important 금지.
 - 같은 선택자를 @media 밖에서 두 번 이상 정의하지 않는다 (중복·겹침 금지).
@@ -56,8 +56,10 @@ for m in re.finditer(r"(@media[^{]*\{)|([^{}]+)\{[^{}]*\}|(\})", flat):
                 problems.append(f"components.css: 중복 정의 {sel}")
             seen[sel] = True
 
-for name in ("app.js", "index.html"):
-    text = (root / name).read_text(encoding="utf-8")
+screens = [root / "app.js", root / "index.html"] + [p for p in (root.parent / "guide").glob("*") if p.suffix in (".js", ".html") and p.name != "content.js"]
+for path in screens:
+    name = f"{path.parent.name}/{path.name}"
+    text = path.read_text(encoding="utf-8")
     for no, line in enumerate(text.splitlines(), 1):
         if re.search(r"\bstyle\s*=", line) or re.search(r"\.style\b", line) or "setProperty" in line:
             problems.append(f"{name}:{no} 인라인 스타일: {line.strip()[:80]}")

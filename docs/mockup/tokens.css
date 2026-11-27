@@ -64,6 +64,13 @@
   --w-modal: 440px;
   --w-search: 320px;
   --w-side: 520px;
+  --zoom-50: 0.5;
+  --zoom-75: 0.75;
+  --zoom-100: 1;
+  --zoom-150: 1.5;
+  --zoom-200: 2;
+  --zoom-250: 2.5;
+  --zoom-300: 3;
   --w-ui-tab: 560px;
   --w-ui-mo: 320px;
   --h-header: 56px;
