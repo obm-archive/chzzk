@@ -5,6 +5,7 @@
   var ZOOM = [50, 75, 100, 150, 200, 250, 300];
   var state = { zoom: 2, dev: window.matchMedia('(max-width: 768px)').matches ? 'mo' : 'pc', menu: false, sOpen: false, hits: null, cur: -1 };
   var TABS = [['overview', '개요'], ['spec', '기능정의'], ['cases', '예외상황'], ['data', '데이터']];
+  var INTRO_TABS = [['overview', '개요'], ['list', '화면목록'], ['log', '개정이력']];
   var DEV = [['pc', 'PC'], ['tab', '태블릿'], ['mo', '모바일']];
   var lastPage = '';
 
@@ -72,18 +73,13 @@
   function texts(blocks) { return [].concat.apply([], blocks.map(plain)); }
 
   /* 화면 구성 */
-  function chips(items, cur, base) {
-    return items.map(function (it) {
-      return '<button class="chip' + (it.id === cur ? ' on' : '') + '" data-go="' + base + '/' + it.id + '">' + esc(it.label) + '</button>';
-    }).join('');
-  }
   function devSwitch() {
     return '<span class="inline">' + DEV.map(function (d) {
       return '<button class="chip' + (state.dev === d[0] ? ' on' : '') + '" data-dev="' + d[0] + '">' + d[1] + '</button>';
     }).join('') + '</span>';
   }
-  function tabsBar(id, cur) {
-    return '<div class="tabs tabs-end">' + TABS.map(function (t) {
+  function tabsBar(id, cur, tabs) {
+    return '<div class="tabs tabs-end">' + (tabs || TABS).map(function (t) {
       return '<button class="tab' + (t[0] === cur ? ' on' : '') + '" data-go="' + id + '/' + t[0] + '">' + t[1] + '</button>';
     }).join('') + '</div>';
   }
@@ -105,10 +101,14 @@
       '<div class="panel">' + body + '</div></div>';
   }
   function introView(r) {
+    var tab = INTRO_TABS.some(function (t) { return t[0] === r.tab; }) ? r.tab : 'overview', h = '<div class="doc"><div class="doc-top"><h1 class="title">소개</h1>' + tabsBar('intro', tab, INTRO_TABS) + '</div>';
+    if (tab !== 'overview') {
+      var one = tab === 'list' ? G.introList : G.introLog;
+      return h + '<div class="single"><div class="panel"><div class="bar">' + esc(INTRO_TABS.filter(function (t) { return t[0] === tab; })[0][1]) + '</div><div class="scroll pad">' + sections(one.blocks) + '</div></div></div></div>';
+    }
     var items = G.intro.map(function (s, i) { return { id: 's' + i, label: s.title, img: 'intro-home', blocks: s.blocks }; });
-    var open = r.tab === '_' ? '' : (items.filter(function (i) { return i.id === r.tab; })[0] || items[0]).id;
-    return '<div class="doc"><div class="doc-top"><h1 class="title">소개</h1><div class="tabs tabs-end"><button class="tab on" data-go="intro">개요</button></div></div>' +
-      pane('intro-home', '<div class="bar">목차</div><div class="scroll">' + accordion(items, open, 'intro') + '</div>') + '</div>';
+    var open = r.sub === '_' ? '' : (items.filter(function (i) { return i.id === r.sub; })[0] || items[0]).id;
+    return h + pane('intro-home', '<div class="bar">목차</div><div class="scroll">' + accordion(items, open, 'intro/overview') + '</div>') + '</div>';
   }
   function pageView(r) {
     var p = G.pages[r.id], top = '<div class="doc-top"><h1 class="title">' + esc(label(r.id)) + '</h1>';
@@ -141,7 +141,9 @@
   /* 검색 */
   function units() {
     var u = [];
-    G.intro.forEach(function (s, i) { u.push({ go: 'intro/s' + i, where: '소개 · ' + s.title, texts: [s.title].concat(texts(s.blocks)) }); });
+    G.intro.forEach(function (s, i) { u.push({ go: 'intro/overview/s' + i, where: '소개 · ' + s.title, texts: [s.title].concat(texts(s.blocks)) }); });
+    u.push({ go: 'intro/list', where: '소개 · 화면목록', texts: texts(G.introList.blocks).concat(G.groups.map(function (x) { return x.pages.map(function (p) { return p[1] + ' ' + p[2]; }).join(' '); })) });
+    u.push({ go: 'intro/log', where: '소개 · 개정이력', texts: texts(G.introLog.blocks) });
     Object.keys(G.pages).forEach(function (id) {
       var p = G.pages[id], L = label(id);
       u.push({ go: id + '/overview', where: L + ' · 개요', texts: texts(p.overview.blocks) });

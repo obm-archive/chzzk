@@ -143,6 +143,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .doc { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3) var(--sp-3); }
 .tabs-end { margin-left: auto; margin-bottom: calc(var(--bw) * -1); border-bottom: 0; }
 .doc-top { min-height: var(--h-tab); display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-4); border-bottom: var(--bw) solid var(--c-line); }
+.single { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
 .pane { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--w-side); grid-template-rows: minmax(0, 1fr); gap: var(--sp-3); }
 .scroll { flex: 1; min-height: 0; overflow: auto; }
 .panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); overflow: hidden; }
