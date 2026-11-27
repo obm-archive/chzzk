@@ -2,7 +2,8 @@
   'use strict';
   var G = window.GUIDE;
   var app = document.getElementById('app');
-  var state = { dev: window.matchMedia('(max-width: 768px)').matches ? 'mo' : 'pc', menu: false, sOpen: false, hits: null, cur: -1 };
+  var ZOOM = [50, 75, 100, 150, 200, 250, 300];
+  var state = { zoom: 2, dev: window.matchMedia('(max-width: 768px)').matches ? 'mo' : 'pc', menu: false, sOpen: false, hits: null, cur: -1 };
   var TABS = [['overview', '개요'], ['spec', '기능정의'], ['cases', '예외상황'], ['data', '데이터']];
   var DEV = [['pc', 'PC'], ['tab', '태블릿'], ['mo', '모바일']];
   var lastPage = '';
@@ -63,7 +64,7 @@
     }).join('') + '</span>';
   }
   function tabsBar(id, cur) {
-    return '<div class="tabs tabs-fill">' + TABS.map(function (t) {
+    return '<div class="tabs tabs-end">' + TABS.map(function (t) {
       return '<button class="tab' + (t[0] === cur ? ' on' : '') + '" data-go="' + id + '/' + t[0] + '">' + t[1] + '</button>';
     }).join('') + '</div>';
   }
@@ -73,8 +74,12 @@
     G.intro.forEach(function (s) { h += '<h2 class="h2">' + esc(s.title) + '</h2>' + s.blocks.map(block).join(''); });
     return h + '</div></div></div>';
   }
-  function picture(img, cls) {
-    return '<img class="ui-img ' + cls + ' ui-' + state.dev + '" src="img/' + img + '-' + state.dev + '.webp" alt="' + esc(img) + '">';
+  function zoomWidth() {
+    var z = ZOOM[state.zoom] / 100, base = state.dev === 'pc' ? '100%' : state.dev === 'tab' ? 'min(var(--w-ui-tab), 100%)' : 'var(--w-ui-mo)';
+    return ' style="width:calc(' + base + ' * ' + z + ')"';
+  }
+  function picture(img, cls, style) {
+    return '<img class="ui-img ' + cls + ' ui-' + state.dev + '"' + (style || '') + ' src="img/' + img + '-' + state.dev + '.webp" alt="' + esc(img) + '">';
   }
   function accordion(items, open, base) {
     return items.map(function (it) {
@@ -98,7 +103,8 @@
     }
     return '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>' +
       '<div class="pane">' +
-      '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main') + '</div></div>' +
+      '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main', zoomWidth()) + '</div>' +
+      '<div class="foot"><button class="chip" data-zoom="-1"' + (state.zoom === 0 ? ' disabled' : '') + ' aria-label="축소">−</button><span class="zoom-val">' + ZOOM[state.zoom] + '%</span><button class="chip" data-zoom="1"' + (state.zoom === ZOOM.length - 1 ? ' disabled' : '') + ' aria-label="확대">+</button></div></div>' +
       '<div class="panel"><div class="bar">' + tabLabel(tab) + '</div>' + body + '</div></div></div>';
   }
 
@@ -197,6 +203,8 @@
       if (k === 'sopen') { state.sOpen = true; render(); return; }
       if (k === 'sclose') { state.sOpen = false; render(); return; }
     }
+    var z = e.target.closest('[data-zoom]');
+    if (z && !z.disabled) { state.zoom = Math.max(0, Math.min(ZOOM.length - 1, state.zoom + (+z.getAttribute('data-zoom')))); render(); return; }
     var d = e.target.closest('[data-dev]');
     if (d) { state.dev = d.getAttribute('data-dev'); render(); return; }
     var n = e.target.closest('[data-go]');
