@@ -20,18 +20,19 @@
 
   /* 블록 */
   function table(b) {
-    var h = '<div class="list flat"><div class="row dense thead">' + b.head.map(function (t, i) { return '<span class="' + b.w[i] + '">' + esc(t) + '</span>'; }).join('') + '</div>';
-    b.rows.forEach(function (r) {
-      h += '<div class="row dense">' + r.map(function (t, i) { return '<span class="' + b.w[i] + (i === 0 ? ' bold' : '') + '">' + esc(t) + '</span>'; }).join('') + '</div>';
-    });
-    return h + '</div>';
+    var many = b.head.length > 2;
+    return '<div class="defs">' + b.rows.map(function (r) {
+      return '<div class="def"><div class="bold">' + esc(r[0]) + '</div>' + r.slice(1).map(function (t, i) {
+        return '<div>' + (many ? '<span class="def-l">' + esc(b.head[i + 1]) + '</span>' : '') + esc(t) + '</div>';
+      }).join('') + '</div>';
+    }).join('') + '</div>';
   }
   function pagesList() {
-    var h = '<div class="list flat"><div class="row dense thead"><span class="c-m">화면</span><span class="c-fill">설명</span></div>';
+    var h = '<div class="defs">';
     G.groups.forEach(function (g) {
       g.pages.forEach(function (p) {
         if (!p[2]) return;
-        h += '<div class="row dense"><span class="c-m"><button class="link bold" data-go="' + p[0] + '">' + esc(p[1]) + '</button></span><span class="c-fill">' + esc(p[2]) + '</span></div>';
+        h += '<div class="def"><div><button class="link bold" data-go="' + p[0] + '">' + esc(p[1]) + '</button></div><div>' + esc(p[2]) + '</div></div>';
       });
     });
     return h + '</div>';
@@ -98,7 +99,7 @@
     return '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>' +
       '<div class="pane">' +
       '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main') + '</div></div>' +
-      '<div class="panel"><div class="bar">' + tabLabel(tab) + '</div>' + body + '</div></div></div>';
+      '<div class="panel">' + body + '</div></div></div>';
   }
 
   /* 메뉴 */
@@ -146,9 +147,9 @@
     var box = document.getElementById('sl');
     if (!box) return;
     if (!q.trim()) { state.hits = null; box.innerHTML = ''; return; }
-    var all = find(q); state.hits = all.slice(0, 20); state.cur = -1;
+    var all = find(q); state.hits = all; state.cur = -1;
     if (!state.hits.length) { box.innerHTML = '<div class="search-list"><div class="pad sub">검색 결과가 없습니다.</div></div>'; return; }
-    box.innerHTML = '<div class="search-list"><div class="pad sub">검색 결과 전체 ' + all.length + '건' + (all.length > 20 ? ' 중 20건 표시' : '') + '</div>' + state.hits.map(function (r, i) {
+    box.innerHTML = '<div class="search-list"><div class="pad sub">검색 결과 전체 ' + all.length + '건</div>' + state.hits.map(function (r, i) {
       return '<button class="row fill found" data-i="' + i + '"><span class="c-fill"><span class="bold">' + esc(r.where) + '</span><br><span class="sub">' + r.snip + '</span></span></button>';
     }).join('') + '</div>';
   }
