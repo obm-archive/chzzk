@@ -38,7 +38,7 @@
     return h + '</div>';
   }
   function block(b) {
-    if (b.t === 'p') return '<p>' + esc(b.text) + '</p>';
+    if (b.t === 'p') return '<p class="lead">' + esc(b.text) + '</p>';
     if (b.t === 'h3') return '<h3 class="bold">' + esc(b.text) + '</h3>';
     if (b.t === 'table') return table(b);
     if (b.t === 'pages') return pagesList();
@@ -99,14 +99,14 @@
     return '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>' +
       '<div class="pane">' +
       '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main') + '</div></div>' +
-      '<div class="panel">' + body + '</div></div></div>';
+      '<div class="panel"><div class="bar">' + tabLabel(tab) + '</div>' + body + '</div></div></div>';
   }
 
   /* 메뉴 */
   function nav(id) {
     var h = '';
-    G.groups.forEach(function (g) {
-      h += '<div class="lnb-title">' + esc(g.name) + '</div>';
+    G.groups.forEach(function (g, i) {
+      if (i) h += '<div class="lnb-sep"></div>';
       g.pages.forEach(function (p) {
         h += '<button class="lnb-link' + (p[0] === id ? ' on' : '') + (p[0] === 'intro' || G.pages[p[0]] ? '' : ' mute') + '" data-go="' + p[0] + '">' + esc(p[1]) + '</button>';
       });
