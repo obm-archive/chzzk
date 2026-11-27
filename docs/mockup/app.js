@@ -42,7 +42,7 @@
     { no: 4, name: '방송 상세', items: [['요약 완료 · 사용자', 'post?r=user'], ['요약 완료 · 관리자', 'post?r=admin']] },
     { no: 5, name: '용어집', items: [['사용자', 'glossary?r=user'], ['관리자', 'glossary?r=admin']] },
     { no: 6, name: '내 정보', items: [['사용자', 'me?r=user'], ['관리자', 'me?r=admin']] },
-    { no: 7, name: '멤버 관리', items: [['가입대기', 'members?r=admin&t=pending'], ['가입승인', 'members?r=admin&t=ok'], ['탈퇴•거절', 'members?r=admin&t=out']] },
+    { no: 7, name: '멤버 관리', items: [['가입대기', 'members?r=admin&t=pending'], ['가입승인', 'members?r=admin&t=ok'], ['탈퇴·거절', 'members?r=admin&t=out']] },
     { no: 8, name: '처리 현황', items: [['관리자', 'ops?r=admin']] }
   ];
 
@@ -350,7 +350,7 @@
   }
   function vMembers(q) {
     var t = q.t || 'pending';
-    var tabs_ = [['pending', '가입대기'], ['ok', '가입승인'], ['out', '탈퇴•거절']];
+    var tabs_ = [['pending', '가입대기'], ['ok', '가입승인'], ['out', '탈퇴·거절']];
     var h = '<h1 class="title">멤버 관리</h1>' + tabs(tabs_.map(function (x) { return [x[0], x[1], 'members?r=admin&t=' + x[0]]; }), t);
     var list = state.members.filter(function (m) { return m.st === t; });
     if (t === 'ok') {
@@ -387,7 +387,7 @@
       if (t === 'out') {
         row = line('<span class="c-s"><span class="chip">' + esc(m.why) + '</span></span>' + nick) +
           line(ml('가입일') + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
-          (m.why === '탈퇴' ? line(ml('처리일') + '<span class="c-s m-end">' + esc(m.done) + '</span>') : '<span class="c-s"></span>');
+          line(ml('처리일') + '<span class="c-s m-end">' + esc(m.done) + '</span>');
       }
       h += '<div class="row">' + row + '</div>';
     });
