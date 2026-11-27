@@ -2,7 +2,7 @@
   'use strict';
   var G = window.GUIDE;
   var app = document.getElementById('app');
-  var state = { dev: 'pc', menu: false, sOpen: false, hits: null, cur: -1 };
+  var state = { dev: window.matchMedia('(max-width: 768px)').matches ? 'mo' : 'pc', menu: false, sOpen: false, hits: null, cur: -1 };
   var TABS = [['overview', '개요'], ['spec', '기능정의'], ['cases', '예외상황'], ['data', '데이터']];
   var DEV = [['pc', 'PC'], ['tab', '태블릿'], ['mo', '모바일']];
   var lastPage = '';
@@ -20,14 +20,14 @@
 
   /* 블록 */
   function table(b) {
-    var h = '<div class="list flat"><div class="row dense row-head">' + b.head.map(function (t, i) { return '<span class="' + b.w[i] + '">' + esc(t) + '</span>'; }).join('') + '</div>';
+    var h = '<div class="list flat"><div class="row dense thead">' + b.head.map(function (t, i) { return '<span class="' + b.w[i] + '">' + esc(t) + '</span>'; }).join('') + '</div>';
     b.rows.forEach(function (r) {
       h += '<div class="row dense">' + r.map(function (t, i) { return '<span class="' + b.w[i] + (i === 0 ? ' bold' : '') + '">' + esc(t) + '</span>'; }).join('') + '</div>';
     });
     return h + '</div>';
   }
   function pagesList() {
-    var h = '<div class="list flat"><div class="row dense row-head"><span class="c-m">화면</span><span class="c-fill">설명</span></div>';
+    var h = '<div class="list flat"><div class="row dense thead"><span class="c-m">화면</span><span class="c-fill">설명</span></div>';
     G.groups.forEach(function (g) {
       g.pages.forEach(function (p) {
         if (!p[2]) return;
@@ -72,22 +72,33 @@
     G.intro.forEach(function (s) { h += '<h2 class="h2">' + esc(s.title) + '</h2>' + s.blocks.map(block).join(''); });
     return h + '</div></div></div>';
   }
+  function picture(img, cls) {
+    return '<img class="ui-img ' + cls + ' ui-' + state.dev + '" src="img/' + img + '-' + state.dev + '.webp" alt="' + esc(img) + '">';
+  }
+  function accordion(items, open, base) {
+    return items.map(function (it) {
+      var on = it.id === open;
+      return '<div class="acc"><button class="acc-head' + (on ? ' acc-open' : '') + '" data-go="' + base + '/' + (on ? '_' : it.id) + '"><span class="acc-mark">' + (on ? '−' : '+') + '</span><span class="grow">' + esc(it.label) + '</span></button>' +
+        (on ? '<div class="acc-body flow">' + picture(it.img, 'ui-inline') + it.blocks.map(block).join('') + '</div>' : '') + '</div>';
+    }).join('');
+  }
   function pageView(r) {
     var p = G.pages[r.id], top = '<div class="doc-top"><h1 class="title">' + esc(label(r.id)) + '</h1>';
     if (!p) return '<div class="doc">' + top + '</div><div class="notice">이 화면의 기능정의는 아직 작성하지 않았습니다.</div></div>';
     var tab = TABS.some(function (t) { return t[0] === r.tab; }) ? r.tab : 'overview';
-    var items = tab === 'spec' ? p.spec : tab === 'cases' ? p.cases : null, cur = null, img, blocks, title;
+    var items = tab === 'spec' ? p.spec : tab === 'cases' ? p.cases : null, open = '', img, body;
     if (items) {
-      cur = items.filter(function (i) { return i.id === r.sub; })[0] || items[0];
-      img = cur.img; blocks = cur.blocks; title = cur.label;
-    } else if (tab === 'overview') { img = p.overview.img; blocks = p.overview.blocks; title = '개요'; }
-    else { img = p.overview.img; blocks = p.data.blocks; title = '데이터'; }
-    var h = '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>';
-    if (items) h += '<div class="inline">' + chips(items, cur.id, r.id + '/' + tab) + '</div>';
-    h += '<div class="pane">' +
-      '<div class="panel"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad"><img class="ui-img ui-' + state.dev + '" src="img/' + img + '-' + state.dev + '.webp" alt="' + esc(img) + '"></div></div>' +
-      '<div class="panel"><div class="bar">' + esc(title) + '</div><div class="scroll pad flow">' + blocks.map(block).join('') + '</div></div></div></div>';
-    return h;
+      open = r.sub === '_' ? '' : (items.filter(function (i) { return i.id === r.sub; })[0] || items[0]).id;
+      img = (items.filter(function (i) { return i.id === open; })[0] || items[0]).img;
+      body = '<div class="scroll">' + accordion(items, open, r.id + '/' + tab) + '</div>';
+    } else {
+      img = p.overview.img;
+      body = '<div class="scroll pad flow">' + picture(img, 'ui-inline') + (tab === 'overview' ? p.overview.blocks : p.data.blocks).map(block).join('') + '</div>';
+    }
+    return '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>' +
+      '<div class="pane">' +
+      '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main') + '</div></div>' +
+      '<div class="panel"><div class="bar">' + tabLabel(tab) + '</div>' + body + '</div></div></div>';
   }
 
   /* 메뉴 */
@@ -135,17 +146,17 @@
     var box = document.getElementById('sl');
     if (!box) return;
     if (!q.trim()) { state.hits = null; box.innerHTML = ''; return; }
-    state.hits = find(q); state.cur = -1;
+    var all = find(q); state.hits = all.slice(0, 20); state.cur = -1;
     if (!state.hits.length) { box.innerHTML = '<div class="search-list"><div class="pad sub">검색 결과가 없습니다.</div></div>'; return; }
-    box.innerHTML = '<div class="search-list">' + state.hits.map(function (r, i) {
-      return '<button class="row fill dense" data-i="' + i + '"><span class="c-fill"><span class="bold">' + esc(r.where) + '</span><br><span class="sub">' + r.snip + '</span></span></button>';
+    box.innerHTML = '<div class="search-list"><div class="pad sub">검색 결과 전체 ' + all.length + '건' + (all.length > 20 ? ' 중 20건 표시' : '') + '</div>' + state.hits.map(function (r, i) {
+      return '<button class="row fill found" data-i="' + i + '"><span class="c-fill"><span class="bold">' + esc(r.where) + '</span><br><span class="sub">' + r.snip + '</span></span></button>';
     }).join('') + '</div>';
   }
   function closeList() { state.hits = null; var box = document.getElementById('sl'); if (box) box.innerHTML = ''; }
   function moveCur(d) {
     if (!state.hits || !state.hits.length) return;
     state.cur = (state.cur + d + state.hits.length) % state.hits.length;
-    var rows = document.querySelectorAll('#sl .row');
+    var rows = document.querySelectorAll('#sl .found');
     Array.prototype.forEach.call(rows, function (el, i) { el.classList.toggle('act', i === state.cur); });
     if (rows[state.cur]) rows[state.cur].scrollIntoView({ block: 'nearest' });
   }
@@ -160,7 +171,7 @@
   /* 렌더 */
   function header() {
     var input = '<input class="input" id="q" placeholder="키워드 검색" autocomplete="off"><span id="sl"></span>';
-    if (state.sOpen) return '<header class="header"><span class="search on">' + input + '</span><button class="btn btn-secondary" data-act="sclose">닫기</button></header>';
+    if (state.sOpen) return '<header class="header"><span class="search search-open">' + input + '</span><button class="btn btn-secondary" data-act="sclose">닫기</button></header>';
     return '<header class="header"><button class="menu-btn" data-act="menu" aria-label="메뉴">☰</button><button class="logo" data-go="intro">' + esc(G.title) + '</button><span class="grow"></span>' +
       '<span class="search">' + input + '</span><button class="btn btn-secondary search-btn" data-act="sopen">검색</button></header>';
   }
