@@ -62,7 +62,9 @@
   --w-auth: 480px;
   --w-thumb: 168px;
   --w-modal: 440px;
-  --w-toc: 200px;
+  --w-search: 320px;
+  --w-ui-tab: 560px;
+  --w-ui-mo: 320px;
   --h-header: 56px;
   --h-tabbar: 64px;
 

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>정의 보완 목록</title>
+<link rel="stylesheet" href="../mockup/tokens.css">
+<link rel="stylesheet" href="../mockup/components.css">
+</head>
+<body>
+<header class="header"><a class="logo" href="index.html">치지직로그 기능정의서</a></header>
+<main class="main stack" id="main"></main>
+<script src="pending.js"></script>
+<script>
+(function () {
+  var P = window.PENDING, esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var h = '<h1 class="title">' + esc(P.title) + '</h1><div class="notice">' + esc(P.note) + '</div>';
+  P.groups.forEach(function (g) {
+    h += '<section class="card stack"><h2 class="h2">' + esc(g.name) + '</h2><div class="list"><div class="row row-head"><span class="c-m">항목</span><span class="c-fill">정해야 할 내용</span><span class="c-m">반영할 위치</span></div>';
+    g.items.forEach(function (i) { h += '<div class="row"><span class="c-m bold">' + esc(i[0]) + '</span><span class="c-fill">' + esc(i[1]) + '</span><span class="c-m">' + esc(i[2]) + '</span></div>'; });
+    h += '</div></section>';
+  });
+  document.getElementById('main').innerHTML = h;
+})();
+</script>
+</body>
+</html>
