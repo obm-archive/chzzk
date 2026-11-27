@@ -20,13 +20,30 @@
   function tabLabel(k) { return TABS.filter(function (t) { return t[0] === k; })[0][1]; }
 
   /* 블록 */
+  function flat(v) { return Array.isArray(v) ? v : [v]; }
+  function lines(v) {
+    return Array.isArray(v) ? v.map(function (t) { return '<div class="li">' + esc(t) + '</div>'; }).join('') : esc(v);
+  }
   function table(b) {
     var many = b.head.length > 2;
     return '<div class="defs">' + b.rows.map(function (r) {
       return '<div class="def"><div class="bold">' + esc(r[0]) + '</div>' + r.slice(1).map(function (t, i) {
-        return '<div>' + (many ? '<span class="def-l">' + esc(b.head[i + 1]) + '</span>' : '') + esc(t) + '</div>';
+        return '<div>' + (many ? '<span class="def-l">' + esc(b.head[i + 1]) + '</span>' : '') + lines(t) + '</div>';
       }).join('') + '</div>';
     }).join('') + '</div>';
+  }
+  function log(b) {
+    return '<div class="defs">' + b.rows.map(function (r) {
+      return '<div class="def"><div class="def-top"><span class="bold">' + esc(r[0]) + '</span><span class="sub">' + esc(r[1]) + '</span></div><div>' + esc(r[2]) + '</div></div>';
+    }).join('') + '</div>';
+  }
+  function sections(blocks) {
+    var out = [], title = '';
+    blocks.forEach(function (b) {
+      if (b.t === 'h3') { title = '<h3 class="bold">' + esc(b.text) + '</h3>'; return; }
+      out.push('<div class="sect">' + title + block(b) + '</div>'); title = '';
+    });
+    return '<div class="sects">' + out.join('') + '</div>';
   }
   function pagesList() {
     var h = '<div class="defs">';
@@ -39,15 +56,17 @@
     return h + '</div>';
   }
   function block(b) {
-    if (b.t === 'p') return '<p class="lead">' + esc(b.text) + '</p>';
+    if (b.t === 'p') return '<p>' + esc(b.text) + '</p>';
     if (b.t === 'h3') return '<h3 class="bold">' + esc(b.text) + '</h3>';
     if (b.t === 'table') return table(b);
+    if (b.t === 'log') return log(b);
     if (b.t === 'pages') return pagesList();
     return '';
   }
   function plain(b) {
     if (b.t === 'p' || b.t === 'h3') return [b.text];
-    if (b.t === 'table') return b.head.concat([].concat.apply([], b.rows));
+    if (b.t === 'table') return b.head.concat([].concat.apply([], b.rows.map(function (r) { return [].concat.apply([], r.map(flat)); })));
+    if (b.t === 'log') return [].concat.apply([], b.rows);
     return [];
   }
   function texts(blocks) { return [].concat.apply([], blocks.map(plain)); }
@@ -80,7 +99,7 @@
     return items.map(function (it) {
       var on = it.id === open;
       return '<div class="acc"><button class="acc-head' + (on ? ' acc-open' : '') + '" data-go="' + base + '/' + (on ? '_' : it.id) + '"><span class="acc-mark">' + (on ? '−' : '+') + '</span><span class="grow">' + esc(it.label) + '</span></button>' +
-        (on ? '<div class="acc-body flow">' + picture(it.img, 'ui-inline') + it.blocks.map(block).join('') + '</div>' : '') + '</div>';
+        (on ? '<div class="acc-body flow">' + picture(it.img, 'ui-inline') + sections(it.blocks) + '</div>' : '') + '</div>';
     }).join('');
   }
   function pane(img, body) {
@@ -106,7 +125,7 @@
       body = '<div class="scroll">' + accordion(items, open, r.id + '/' + tab) + '</div>';
     } else {
       img = p.overview.img;
-      body = '<div class="scroll pad flow">' + picture(img, 'ui-inline') + (tab === 'overview' ? p.overview.blocks : p.data.blocks).map(block).join('') + '</div>';
+      body = '<div class="scroll pad flow">' + picture(img, 'ui-inline') + sections(tab === 'overview' ? p.overview.blocks : p.data.blocks) + '</div>';
     }
     return '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>' + pane(img, '<div class="bar">' + tabLabel(tab) + '</div>' + body) + '</div>';
   }

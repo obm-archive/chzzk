@@ -172,7 +172,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .acc-open, .acc-open:hover { background: var(--c-text); color: var(--c-surface); }
 .acc-mark { flex: none; width: var(--icon); text-align: center; }
 .acc-body { padding: var(--sp-3); border-left: var(--bw-tab) solid var(--c-text); }
-.lead { padding-bottom: var(--sp-3); border-bottom: var(--bw) solid var(--c-line); }
+.sects { display: grid; grid-auto-rows: max-content; }
+.sect { display: grid; gap: var(--sp-2); padding: var(--sp-3) 0; border-top: var(--bw) solid var(--c-line-strong); }
+.sect:first-child { padding-top: 0; border-top: 0; }
+.sect:last-child { padding-bottom: 0; }
+.li { position: relative; padding-left: var(--sp-3); }
+.li::before { content: '·'; position: absolute; left: var(--sp-1); }
+.def-top { display: flex; justify-content: space-between; gap: var(--sp-3); }
 .lnb-sep { margin: var(--sp-2) var(--sp-2); border-top: var(--bw) solid var(--c-line); }
 .ui-inline { display: none; }
 .search-list { position: fixed; top: calc(var(--h-header) + var(--sp-1)); right: var(--sp-3); z-index: var(--z-modal); width: var(--w-modal); max-height: 70vh; overflow-y: auto; background: var(--c-surface); border: var(--bw) solid var(--c-line-strong); border-radius: var(--r-card); box-shadow: var(--shadow-dialog); }
