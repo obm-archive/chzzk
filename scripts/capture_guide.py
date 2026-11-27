@@ -11,6 +11,9 @@ _buf = io.BytesIO(); Image.new('RGB', (16, 9), (224, 224, 224)).save(_buf, 'PNG'
 DEVICES = {'pc': (1440, 900), 'tab': (900, 1100), 'mo': (390, 844)}
 
 # (파일명, 해시, 촬영 전 클릭할 선택자 목록)
+# 토스트(2초)가 사라진 뒤 찍어야 하는 캡처
+WAIT = {'members-empty': 2400}
+
 JOBS = [
     ('intro-home',             'home?r=user', []),
     ('members-pending',        'members?r=admin&t=pending', []),
@@ -18,6 +21,10 @@ JOBS = [
     ('members-ok',             'members?r=admin&t=ok', []),
     ('members-out',            'members?r=admin&t=out', []),
     ('members-withdraw-modal', 'members?r=admin&t=ok', ['[data-act="withdraw"]']),
+    ('members-toast-approve',  'members?r=admin&t=pending', ['[data-act="m-approve"]']),
+    ('members-toast-reject',   'members?r=admin&t=pending', ['[data-act="m-reject"]']),
+    ('members-toast-withdraw', 'members?r=admin&t=ok', ['[data-act="withdraw"]', '[data-act="confirm-yes"]']),
+    ('members-empty',          'members?r=admin&t=ok', ['[data-act="idle"][data-v="90"]', '[data-act="withdraw"]', '[data-act="confirm-yes"]']),
 ]
 
 def main():
@@ -39,7 +46,7 @@ def main():
                     page.wait_for_selector('.header')
                     for sel in clicks:
                         page.locator(sel).first.click()
-                    page.wait_for_timeout(150)
+                    page.wait_for_timeout(WAIT.get(name, 150))
                     png = page.screenshot()
                     Image.open(io.BytesIO(png)).convert('RGB').save(OUT / f'{name}-{dev}.webp', 'WEBP', quality=82)
                     print('saved', f'{name}-{dev}.webp')
