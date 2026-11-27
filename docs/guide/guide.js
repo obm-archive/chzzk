@@ -69,11 +69,6 @@
     }).join('') + '</div>';
   }
 
-  function introView() {
-    var h = '<div class="doc"><div class="doc-top"><h1 class="title">' + esc(G.title) + '</h1></div><div class="panel"><div class="scroll pad flow">';
-    G.intro.forEach(function (s) { h += '<h2 class="h2">' + esc(s.title) + '</h2>' + s.blocks.map(block).join(''); });
-    return h + '</div></div></div>';
-  }
   function zoomWidth() {
     var z = ZOOM[state.zoom] / 100, base = state.dev === 'pc' ? '100%' : state.dev === 'tab' ? 'min(var(--w-ui-tab), 100%)' : 'var(--w-ui-mo)';
     return ' style="width:calc(' + base + ' * ' + z + ')"';
@@ -88,6 +83,18 @@
         (on ? '<div class="acc-body flow">' + picture(it.img, 'ui-inline') + it.blocks.map(block).join('') + '</div>' : '') + '</div>';
     }).join('');
   }
+  function pane(img, body) {
+    return '<div class="pane">' +
+      '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main', zoomWidth()) + '</div>' +
+      '<div class="foot"><button class="chip" data-zoom="-1"' + (state.zoom === 0 ? ' disabled' : '') + ' aria-label="축소">−</button><span class="zoom-val">' + ZOOM[state.zoom] + '%</span><button class="chip" data-zoom="1"' + (state.zoom === ZOOM.length - 1 ? ' disabled' : '') + ' aria-label="확대">+</button></div></div>' +
+      '<div class="panel">' + body + '</div></div>';
+  }
+  function introView(r) {
+    var items = G.intro.map(function (s, i) { return { id: 's' + i, label: s.title, img: 'intro-home', blocks: s.blocks }; });
+    var open = r.tab === '_' ? '' : (items.filter(function (i) { return i.id === r.tab; })[0] || items[0]).id;
+    return '<div class="doc"><div class="doc-top"><h1 class="title">소개</h1></div>' +
+      pane('intro-home', '<div class="bar">목차</div><div class="scroll">' + accordion(items, open, 'intro') + '</div>') + '</div>';
+  }
   function pageView(r) {
     var p = G.pages[r.id], top = '<div class="doc-top"><h1 class="title">' + esc(label(r.id)) + '</h1>';
     if (!p) return '<div class="doc">' + top + '</div><div class="notice">이 화면의 기능정의는 아직 작성하지 않았습니다.</div></div>';
@@ -101,11 +108,7 @@
       img = p.overview.img;
       body = '<div class="scroll pad flow">' + picture(img, 'ui-inline') + (tab === 'overview' ? p.overview.blocks : p.data.blocks).map(block).join('') + '</div>';
     }
-    return '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>' +
-      '<div class="pane">' +
-      '<div class="panel ui-side"><div class="bar inline"><span class="grow">화면 UI</span>' + devSwitch() + '</div><div class="scroll pad">' + picture(img, 'ui-main', zoomWidth()) + '</div>' +
-      '<div class="foot"><button class="chip" data-zoom="-1"' + (state.zoom === 0 ? ' disabled' : '') + ' aria-label="축소">−</button><span class="zoom-val">' + ZOOM[state.zoom] + '%</span><button class="chip" data-zoom="1"' + (state.zoom === ZOOM.length - 1 ? ' disabled' : '') + ' aria-label="확대">+</button></div></div>' +
-      '<div class="panel"><div class="bar">' + tabLabel(tab) + '</div>' + body + '</div></div></div>';
+    return '<div class="doc">' + top + tabsBar(r.id, tab) + '</div>' + pane(img, '<div class="bar">' + tabLabel(tab) + '</div>' + body) + '</div>';
   }
 
   /* 메뉴 */
@@ -123,7 +126,7 @@
   /* 검색 */
   function units() {
     var u = [];
-    G.intro.forEach(function (s) { u.push({ go: 'intro', where: '소개 · ' + s.title, texts: [s.title].concat(texts(s.blocks)) }); });
+    G.intro.forEach(function (s, i) { u.push({ go: 'intro/s' + i, where: '소개 · ' + s.title, texts: [s.title].concat(texts(s.blocks)) }); });
     Object.keys(G.pages).forEach(function (id) {
       var p = G.pages[id], L = label(id);
       u.push({ go: id + '/overview', where: L + ' · 개요', texts: texts(p.overview.blocks) });
@@ -184,7 +187,7 @@
   }
   function render() {
     var r = route(), q = document.getElementById('q'), keep = q ? q.value : '';
-    app.innerHTML = '<div class="fixed">' + header() + '<div class="fit"><nav class="nav lnb">' + nav(r.id) + '</nav>' + (r.id === 'intro' ? introView() : pageView(r)) + '</div></div>' +
+    app.innerHTML = '<div class="fixed">' + header() + '<div class="fit"><nav class="nav lnb">' + nav(r.id) + '</nav>' + (r.id === 'intro' ? introView(r) : pageView(r)) + '</div></div>' +
       (state.menu ? '<div class="modal-bg" data-act="menu"></div><nav class="nav drawer">' + nav(r.id) + '</nav>' : '');
     var nq = document.getElementById('q');
     if (nq) { nq.value = keep; if (state.sOpen) nq.focus(); }

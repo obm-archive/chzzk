@@ -7,10 +7,12 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'docs' / 'guide' / 'img'
 PORT = 8765
+_buf = io.BytesIO(); Image.new('RGB', (16, 9), (224, 224, 224)).save(_buf, 'PNG'); PLACEHOLDER = _buf.getvalue()
 DEVICES = {'pc': (1440, 900), 'tab': (900, 1100), 'mo': (390, 844)}
 
 # (파일명, 해시, 촬영 전 클릭할 선택자 목록)
 JOBS = [
+    ('intro-home',             'home?r=user', []),
     ('members-pending',        'members?r=admin&t=pending', []),
     ('members-pending-sel',    'members?r=admin&t=pending', ['[data-sel="m1"]', '[data-sel="m2"]']),
     ('members-ok',             'members?r=admin&t=ok', []),
@@ -28,6 +30,9 @@ def main():
             for dev, (w, h) in DEVICES.items():
                 ctx = b.new_context(viewport={'width': w, 'height': h})
                 page = ctx.new_page()
+                # 치지직 썸네일 CDN은 외부 요청이라 막히므로 회색 자리표시 이미지로 대체한다
+                ctx.route('**/*', lambda route: route.fulfill(status=200, content_type='image/png', body=PLACEHOLDER)
+                          if route.request.resource_type == 'image' and 'localhost' not in route.request.url else route.continue_())
                 for name, hash_, clicks in JOBS:
                     page.goto(f'http://localhost:{PORT}/mockup/index.html#/{hash_}')
                     page.reload()
