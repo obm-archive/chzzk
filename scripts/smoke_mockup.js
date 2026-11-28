@@ -83,7 +83,7 @@ click(byAct('sel-all'));const c=$('[data-act="sel-all"]');c.checked=true;c.dispa
 ok(!byAct('withdraw-bulk').disabled,'bulk withdraw enabled after select');
 click(byAct('withdraw-bulk'));click(byAct('confirm-yes'));ok(!$('.modal')&&$$('[data-act="withdraw"]').length===0,'bulk withdraw done');
 nav('members?r=admin&t=out');ok(txt().includes('탈퇴')&&txt().includes('거절'),'out tab shows withdrawn/rejected');
-nav('ops?r=admin&t=all');ok(['대기','처리중','완료','실패'].every(s=>txt().includes(s))&&!txt().includes('병합')&&$$('.chip.is-danger').length===1,'ops: 4 statuses, no merge/split');
+nav('ops?r=admin&t=all');ok(['대기','처리중','완료','실패'].every(s=>txt().includes(s))&&!txt().includes('병합')&&$$('.chip.is-danger').length===2,'ops: 4 statuses, no merge/split');
 nav('ops?r=admin&t=todo');ok($$('.chip').every(c=>c.textContent!=='완료'),'ops todo tab hides completed');
 nav('ops?r=admin&t=all');click($('[data-act="pub"][data-v="hide"]'));ok($$('[data-act="ops-show"]').length===1&&txt().includes('전체 4건'),'ops: hide filter lists 4, 1 publishable');click(byAct('ops-show'));ok($$('[data-act="ops-show"]').length===0,'publish removes from hide filter');
 nav('ops?r=admin&t=todo');ok(!$('[data-act="pub"]'),'ops todo tab has no publish filter');

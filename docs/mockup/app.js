@@ -425,10 +425,12 @@
       if (o.st === '완료' || o.st === '실패') act += rbtn('재처리', 'post-redo', o.no);
       if (o.st !== '처리중') act += rbtn('삭제', 'ops-del', o.no, 'btn-secondary is-danger');
       var box = o.st !== '처리중' ? '<label class="check"><input type="checkbox" data-sel="o' + o.no + '"' + (state.sel['o' + o.no] ? ' checked' : '') + '></label>' : '';
+      var chipSt = '<span class="chip ' + o.cls + '">' + o.st + '</span>';
+      var chipPub = '<span class="chip">' + (o.hidden ? '숨김' : '공개') + '</span>';
       h += '<div class="row">' +
-        line('<span class="c-xs">' + box + '</span><span class="c-s c-hide">' + o.no + '</span><span class="c-fill">' + esc(o.title) + '</span><span class="c-s m-end m-only">' + o.no + '</span>') +
-        line(ml('처리상태') + '<span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + '</span></span>') +
-        line(ml('게시상태') + '<span class="c-s m-end"><span class="chip">' + (o.hidden ? '숨김' : '공개') + '</span></span>') +
+        line('<span class="c-xs">' + box + '</span><span class="c-s c-hide">' + o.no + '</span><span class="c-fill">' + esc(o.title) + '</span><span class="m-only m-end">' + chipSt + '</span><span class="m-only">' + chipPub + '</span>') +
+        line(ml('다시보기번호') + '<span class="c-s m-end m-only">' + o.no + '</span>') +
+        '<span class="c-s c-hide">' + chipSt + '</span><span class="c-s c-hide">' + chipPub + '</span>' +
         line(ml('처리시작일시') + '<span class="c-d m-end">' + (o.start ? esc(o.start.slice(0, 16)) : '-') + '</span>') +
         line(ml('처리완료일시') + '<span class="c-d m-end">' + (o.end ? esc(o.end.slice(0, 16)) : '-') + '</span>') +
         '<span class="c-act c-act-w">' + act + '</span></div>';
