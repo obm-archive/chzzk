@@ -374,10 +374,10 @@
       var nick = '<span class="c-fill bold">' + esc(m.nick) + '</span>';
       var row = '';
       if (t === 'pending') {
-        row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="m' + m.id + '"' + (state.sel['m' + m.id] ? ' checked' : '') + '></label></span>' + nick) +
+        row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="m' + m.id + '"' + (state.sel['m' + m.id] ? ' checked' : '') + '></label></span>' + nick + '<span class="c-s m-end m-only">' + esc(m.joined) + '</span>') +
           line(ml('등급 답변') + '<span class="c-s m-end">' + esc(m.grade) + '</span>') +
           line(ml('최근 게시물') + '<span class="c-s m-end"><button class="link" data-act="seek" data-v="링크">링크</button></span>') +
-          line(ml('가입일') + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
+          '<span class="c-s c-hide">' + esc(m.joined) + '</span>' +
           '<span class="c-act">' + rbtn('승인', 'm-approve', m.id, 'btn-primary') + rbtn('거절', 'm-reject', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'ok') {
@@ -386,8 +386,9 @@
           '<span class="c-act">' + rbtn('탈퇴', 'withdraw', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'out') {
-        row = line(nick + '<span class="c-s m-end"><span class="chip">' + esc(m.why) + '</span></span>') +
-          line(ml('가입일') + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
+        row = line(nick + '<span class="c-s m-end m-only">' + esc(m.joined) + '</span>') +
+          line(ml('상태') + '<span class="c-s m-end"><span class="chip">' + esc(m.why) + '</span></span>') +
+          '<span class="c-s c-hide">' + esc(m.joined) + '</span>' +
           line(ml('처리일') + '<span class="c-s m-end">' + esc(m.done) + '</span>');
       }
       h += '<div class="row">' + row + '</div>';
