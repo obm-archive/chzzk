@@ -71,9 +71,9 @@
       { id: 11, nick: '신청자00', st: 'out', joined: '2026-11-01', seen: '', done: '2026-11-02', why: '거절' }
     ],
     ops: [
-      { no: 16372880, title: '대기 중인 방송 예시', st: '대기', cls: '', start: '', end: '', hidden: false },
-      { no: 16372104, title: '처리중인 방송 예시', st: '처리중', cls: 'is-info', start: '2026-11-26 19:00:12', end: '', hidden: false },
-      { no: 16358201, title: '실패한 방송 예시', st: '실패', cls: 'is-danger', start: '2026-11-23 20:10:40', end: '', hidden: false },
+      { no: 16372880, title: '대기 중인 방송 예시', st: '대기', cls: '', start: '', end: '', hidden: true },
+      { no: 16372104, title: '처리중인 방송 예시', st: '처리중', cls: 'is-info', start: '2026-11-26 19:00:12', end: '', hidden: true },
+      { no: 16358201, title: '실패한 방송 예시', st: '실패', cls: 'is-danger', start: '2026-11-23 20:10:40', end: '', hidden: true },
       { no: 16365315, title: M.post.title, st: '완료', cls: '', start: '2026-11-26 03:40:10', end: '2026-11-26 04:12:51', hidden: false },
       { no: 16301177, title: '숨김 처리한 방송 예시', st: '완료', cls: '', start: '2026-11-10 20:05:00', end: '2026-11-10 20:41:30', hidden: true }
     ]
@@ -395,29 +395,35 @@
     });
     return shell('members', 'admin', h + '</div>' + pager(pg, 'members?r=admin&t=' + t));
   }
+  function setOps(el, hidden) {
+    var no = +el.getAttribute('data-id');
+    state.ops.forEach(function (o) { if (o.no === no) o.hidden = hidden; });
+    render();
+  }
   function vOps(q) {
     var t = q.t || 'all';
     var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">네이버 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
     h += tabs([['all', '전체', 'ops?r=admin&t=all'], ['todo', '처리필요', 'ops?r=admin&t=todo'], ['hidden', '숨김', 'ops?r=admin&t=hidden']], t);
     var list = state.ops.filter(function (o) {
       if (t === 'hidden') return o.hidden;
-      return t === 'all' || (!o.hidden && o.st !== '완료');
+      return t === 'all' || o.st !== '완료';
     });
     var pg = pageOf(list, q);
     h += toolbar(pg.total, null);
-    h += '<div class="list"><div class="row row-head"><span class="c-s">방송번호</span><span class="c-fill">제목</span><span class="c-s">처리상태</span><span class="c-s">게시상태</span><span class="c-d">시작일시</span><span class="c-d">완료일시</span><span class="c-act">관리</span></div>';
+    h += '<div class="list"><div class="row row-head"><span class="c-s">다시보기번호</span><span class="c-fill">제목</span><span class="c-s">처리상태</span><span class="c-s">게시상태</span><span class="c-d">처리시작일시</span><span class="c-d">처리완료일시</span><span class="c-act c-act-w">관리</span></div>';
     if (!list.length) h += '<div class="row mute">해당하는 방송이 없습니다.</div>';
     pg.items.forEach(function (o) {
       var act = '';
-      if (o.hidden) act = rbtn('숨김해제', 'ops-unhide', o.no);
-      else if (o.st === '완료' || o.st === '실패') act = rbtn('재처리', 'post-redo', o.no);
+      if (o.st === '완료') act += o.hidden ? rbtn('공개', 'ops-show', o.no) : rbtn('숨김', 'ops-hide', o.no);
+      if (o.st === '완료' || o.st === '실패') act += rbtn('재처리', 'post-redo', o.no);
+      if (o.st !== '처리중') act += rbtn('삭제', 'ops-del', o.no, 'btn-secondary is-danger');
       h += '<div class="row"><span class="c-s c-hide">' + o.no + '</span>' +
         line('<span class="c-fill">' + esc(o.title) + '</span><span class="c-s m-end m-only">' + o.no + '</span>') +
         line(ml('처리상태') + '<span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + '</span></span>') +
         line(ml('게시상태') + '<span class="c-s m-end"><span class="chip">' + (o.hidden ? '숨김' : '공개') + '</span></span>') +
-        line(ml('시작일시') + '<span class="c-d m-end">' + (o.start ? esc(o.start.slice(0, 16)) : '-') + '</span>') +
-        line(ml('완료일시') + '<span class="c-d m-end">' + (o.end ? esc(o.end.slice(0, 16)) : '-') + '</span>') +
-        '<span class="c-act">' + act + '</span></div>';
+        line(ml('처리시작일시') + '<span class="c-d m-end">' + (o.start ? esc(o.start.slice(0, 16)) : '-') + '</span>') +
+        line(ml('처리완료일시') + '<span class="c-d m-end">' + (o.end ? esc(o.end.slice(0, 16)) : '-') + '</span>') +
+        '<span class="c-act c-act-w">' + act + '</span></div>';
     });
     return shell('ops', 'admin', h + '</div>' + pager(pg, 'ops?r=admin&t=' + t));
   }
@@ -491,10 +497,10 @@
     seek: function (el) { toast(el.getAttribute('data-v') + ' 시점으로 이동'); },
     'post-hide': function () { toast('숨김 처리했습니다'); },
     'post-redo': function () { toast('재처리를 요청했습니다'); },
-    'ops-unhide': function (el) {
-      var no = +el.getAttribute('data-id');
-      state.ops.forEach(function (o) { if (o.no === no) o.hidden = false; });
-      render(); toast('숨김을 해제했습니다');
+    'ops-hide': function (el) { setOps(el, true); toast('숨김 처리했습니다'); },
+    'ops-show': function (el) { setOps(el, false); toast('공개했습니다'); },
+    'ops-del': function (el) {
+      state.modal = { kind: 'confirm', what: 'ops', title: '방송 삭제', yes: '삭제', ids: [+el.getAttribute('data-id')], text: '이 방송을 삭제합니다.' }; render();
     },
     'term-add': function () { state.form.tname = ''; state.form.ttype = TERM_TYPES[0]; state.form.tdesc = ''; state.err = ''; state.modal = { kind: 'term', id: 0 }; render(); },
     'term-edit': function (el) {
@@ -535,6 +541,7 @@
     'confirm-yes': function () {
       var m = state.modal;
       if (m.what === 'member') m.ids.forEach(function (id) { setMember(id, 'out', '탈퇴'); });
+      else if (m.what === 'ops') state.ops = state.ops.filter(function (o) { return m.ids.indexOf(o.no) < 0; });
       else state.gloss = state.gloss.filter(function (g) { return m.ids.indexOf(g.id) < 0; });
       state.sel = {}; state.modal = null; render(); toast(m.what === 'member' ? '탈퇴 처리했습니다' : '삭제했습니다');
     },

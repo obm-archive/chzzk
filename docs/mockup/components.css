@@ -129,6 +129,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .c-m { flex: none; width: var(--col-m); }
 .c-d { flex: none; width: var(--col-m); }
 .c-act { flex: none; width: var(--col-m); display: flex; align-items: center; gap: var(--sp-2); }
+.c-act-w { width: var(--col-l); flex-wrap: wrap; }
 .c-fill { flex: 1; min-width: 0; }
 .line { display: contents; }
 .m-label { display: none; }
@@ -205,6 +206,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    768 이하 = 모바일: 목록 행을 줄 단위로, 박스 해제, 하단 바 */
 @media (max-width: 1024px) {
   .c-s, .c-d { width: var(--col-t); }
+  .c-act-w { width: var(--col-m); }
   .lnb { display: none; }
   .menu-btn { display: flex; }
   .md-col { grid-template-columns: 1fr; }
