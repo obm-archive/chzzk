@@ -17,9 +17,9 @@ const byAct=(a,v)=>$$(`[data-act="${a}"]`).find(e=>v==null||e.getAttribute('data
 const settle=()=>{w.dispatchEvent(new w.HashChangeEvent('hashchange'));$$('[class]').forEach(e=>e.classList.forEach(c=>used.add(c)));};
 const setf=(k,v)=>{const e=$(`[data-f="${k}"]`);e.value=v;e.dispatchEvent(new w.Event('input',{bubbles:true}))};
 
-nav('');ok(txt().includes('화면 목록')&&!$('.title').textContent.includes('치지직로그'),'index is 화면 목록, not login');
+nav('');ok(txt().includes('화면 목록')&&!$('.title').textContent.includes('치지직.Log'),'index is 화면 목록, not login');
 ok($$('[data-go]').length>=23,'index lists screen links ('+$$('[data-go]').length+')');
-ok(d.title==='치지직로그','document title = service name');
+ok(d.title==='치지직.Log','document title = service name');
 // 모든 목록 링크를 열어 오류 없이 그려지는지
 const links=$$('[data-go]').map(e=>e.getAttribute('data-go'));
 links.forEach(l=>{nav(l);if(!$('#root').innerHTML.length)ok(false,'empty '+l);});
