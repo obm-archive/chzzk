@@ -428,7 +428,7 @@
       var chipSt = '<span class="chip ' + o.cls + '">' + o.st + '</span>';
       var chipPub = '<span class="chip">' + (o.hidden ? '숨김' : '공개') + '</span>';
       h += '<div class="row">' +
-        line('<span class="c-xs">' + box + '</span><span class="c-s c-hide">' + o.no + '</span><span class="c-fill">' + esc(o.title) + '</span><span class="m-only m-end">' + chipSt + '</span><span class="m-only">' + chipPub + '</span>') +
+        line('<span class="c-xs">' + box + '</span><span class="c-s c-hide">' + o.no + '</span><span class="c-fill">' + esc(o.title) + '</span><span class="m-chips m-end">' + chipSt + chipPub + '</span>') +
         line(ml('다시보기번호') + '<span class="c-s m-end m-only">' + o.no + '</span>') +
         '<span class="c-s c-hide">' + chipSt + '</span><span class="c-s c-hide">' + chipPub + '</span>' +
         line(ml('처리시작일시') + '<span class="c-d m-end">' + (o.start ? esc(o.start.slice(0, 16)) : '-') + '</span>') +

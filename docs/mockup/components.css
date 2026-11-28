@@ -134,6 +134,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .line { display: contents; }
 .m-label { display: none; }
 .m-only { display: none; }
+.m-chips { display: none; }
 
 /* ── 모달 · 토스트 · 진행 막대 ── */
 .modal-bg { position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; padding: var(--sp-3); background: var(--c-overlay); }
@@ -229,6 +230,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .m-end { margin-left: auto; }
   .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
   .m-only { display: inline; }
+  .m-chips { display: flex; gap: var(--sp-1); }
   .c-xs, .c-s, .c-m, .c-d { flex: none; width: auto; }
   .c-act { width: 100%; }
   .m-grow { flex: 1; }
