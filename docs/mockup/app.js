@@ -417,7 +417,7 @@
     var picks = state.ops.filter(function (o) { return state.sel['o' + o.no]; });
     var offDel = picks.length ? '' : 'disabled';
     h += toolbar(pg.total, picks.length, btn('선택삭제', 'ops-del-bulk', offDel, 'btn-secondary is-danger'));
-    h += '<div class="list"><div class="row row-head"><span class="c-xs"><label class="check"><input type="checkbox" data-act="osel-all"></label></span><span class="c-s">다시보기번호</span><span class="c-fill">제목</span><span class="c-s">처리상태</span><span class="c-s">게시상태</span><span class="c-d">처리시작일시</span><span class="c-d">처리완료일시</span><span class="c-act c-act-w">관리</span></div>';
+    h += '<div class="list"><div class="row row-head"><span class="c-xs"><label class="check"><input type="checkbox" data-act="osel-all"></label></span><span class="c-n">다시보기번호</span><span class="c-title">제목</span><span class="c-n">처리상태</span><span class="c-n">게시상태</span><span class="c-d">처리시작일시</span><span class="c-d">처리완료일시</span><span class="c-act c-act-w">관리</span></div>';
     if (!list.length) h += '<div class="row mute">해당하는 방송이 없습니다.</div>';
     pg.items.forEach(function (o) {
       var act = '';
@@ -428,9 +428,9 @@
       var chipSt = '<span class="chip ' + o.cls + '">' + o.st + '</span>';
       var chipPub = '<span class="chip">' + (o.hidden ? '숨김' : '공개') + '</span>';
       h += '<div class="row">' +
-        line('<span class="c-xs">' + box + '</span><span class="c-s c-hide">' + o.no + '</span><span class="c-fill">' + esc(o.title) + '</span><span class="m-chips m-end">' + chipSt + chipPub + '</span>') +
-        line(ml('다시보기번호') + '<span class="c-s m-end m-only">' + o.no + '</span>') +
-        '<span class="c-s c-hide">' + chipSt + '</span><span class="c-s c-hide">' + chipPub + '</span>' +
+        line('<span class="c-xs">' + box + '</span><span class="c-n c-hide">' + o.no + '</span><span class="c-title">' + esc(o.title) + '</span><span class="m-chips m-end">' + chipSt + chipPub + '</span>') +
+        line(ml('다시보기번호') + '<span class="m-end m-only">' + o.no + '</span>') +
+        '<span class="c-n c-hide">' + chipSt + '</span><span class="c-n c-hide">' + chipPub + '</span>' +
         line(ml('처리시작일시') + '<span class="c-d m-end">' + (o.start ? esc(o.start.slice(0, 16)) : '-') + '</span>') +
         line(ml('처리완료일시') + '<span class="c-d m-end">' + (o.end ? esc(o.end.slice(0, 16)) : '-') + '</span>') +
         '<span class="c-act c-act-w">' + act + '</span></div>';

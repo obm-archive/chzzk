@@ -120,16 +120,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .g-title { font-weight: var(--fw-bold); }
 
 /* ── 목록 ── */
-.list { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); overflow: hidden; }
+.list { background: var(--c-surface); border: var(--bw) solid var(--c-line); border-radius: var(--r-card); overflow-x: auto; overflow-y: hidden; }
 .row { display: flex; align-items: center; text-align: left; gap: var(--sp-3); min-height: var(--h-row); padding: var(--sp-2) var(--sp-3); border-bottom: var(--bw) solid var(--c-line); font-size: var(--fs-s); }
 .row:last-child { border-bottom: 0; }
 .row-head { background: var(--c-fill); color: var(--c-text-sub); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
 .c-xs { flex: none; width: var(--col-xs); }
 .c-s { flex: none; width: var(--col-s); }
 .c-m { flex: none; width: var(--col-m); }
-.c-d { flex: none; width: var(--col-m); }
+.c-n { flex: 0 1 var(--col-s); min-width: var(--col-n); }
+.c-d { flex: 0 1 var(--col-m); min-width: var(--col-dmin); }
+.c-title { flex: 1; min-width: var(--col-title); }
 .c-act { flex: none; width: var(--col-m); display: flex; align-items: center; gap: var(--sp-2); }
-.c-act-w { width: var(--col-l); flex-wrap: wrap; }
+.c-act-w { flex: 0 1 var(--col-l); width: auto; min-width: var(--col-m); flex-wrap: wrap; }
 .c-fill { flex: 1; min-width: 0; }
 .line { display: contents; }
 .m-label { display: none; }
@@ -206,8 +208,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    1024 이하 = 태블릿: 왼쪽 메뉴를 햄버거로, 상단 이미지+요약을 위아래로
    768 이하 = 모바일: 목록 행을 줄 단위로, 박스 해제, 하단 바 */
 @media (max-width: 1024px) {
-  .c-s, .c-d { width: var(--col-t); }
-  .c-act-w { width: var(--col-m); }
+  .c-s { width: var(--col-t); }
   .lnb { display: none; }
   .menu-btn { display: flex; }
   .md-col { grid-template-columns: 1fr; }
@@ -231,7 +232,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
   .m-only { display: inline; }
   .m-chips { display: flex; gap: var(--sp-1); }
-  .c-xs, .c-s, .c-m, .c-d { flex: none; width: auto; }
+  .c-xs, .c-s, .c-m, .c-n, .c-d, .c-act-w { flex: none; width: auto; min-width: 0; }
   .c-act { width: 100%; }
   .m-grow { flex: 1; }
   .search { display: none; }

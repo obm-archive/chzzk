@@ -53,11 +53,14 @@
   --icon: 20px;
 
   /* 목록 열 너비 프리셋: xs·s·m 고정, fill 자율 */
-  --col-xs: 56px;
+  --col-xs: 40px;
   --col-s: 112px;
   --col-m: 160px;
   --col-t: 88px;
   --col-l: 240px;
+  --col-n: 72px;
+  --col-dmin: 84px;
+  --col-title: 120px;
 
   /* 레이아웃 */
   --w-lnb: 220px;
