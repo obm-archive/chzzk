@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var SERVICE = '치지직.Log';
+  var SERVICE = '킹Log';
   var TODAY = '2026-11-26';
   var PAGE_SIZE = 10;
   var MOCK_PW = '1234'; // 목업 전용 공통 비밀번호(실서비스는 서버 설정값)
