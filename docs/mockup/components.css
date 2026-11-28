@@ -127,6 +127,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .c-xs { flex: none; width: var(--col-xs); }
 .c-s { flex: none; width: var(--col-s); }
 .c-m { flex: none; width: var(--col-m); }
+.c-d { flex: none; width: var(--col-m); }
 .c-act { flex: none; width: var(--col-m); display: flex; align-items: center; gap: var(--sp-2); }
 .c-fill { flex: 1; min-width: 0; }
 .line { display: contents; }
@@ -203,6 +204,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    1024 이하 = 태블릿: 왼쪽 메뉴를 햄버거로, 상단 이미지+요약을 위아래로
    768 이하 = 모바일: 목록 행을 줄 단위로, 박스 해제, 하단 바 */
 @media (max-width: 1024px) {
+  .c-s, .c-d { width: var(--col-t); }
   .lnb { display: none; }
   .menu-btn { display: flex; }
   .md-col { grid-template-columns: 1fr; }
@@ -225,7 +227,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .m-end { margin-left: auto; }
   .m-label { display: inline; margin-right: var(--sp-1); color: var(--c-text-mute); }
   .m-only { display: inline; }
-  .c-xs, .c-s, .c-m { flex: none; width: auto; }
+  .c-xs, .c-s, .c-m, .c-d { flex: none; width: auto; }
   .c-act { width: 100%; }
   .m-grow { flex: 1; }
   .search { display: none; }

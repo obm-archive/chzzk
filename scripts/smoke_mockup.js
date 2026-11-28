@@ -84,7 +84,7 @@ ok(!byAct('withdraw-bulk').disabled,'bulk withdraw enabled after select');
 click(byAct('withdraw-bulk'));click(byAct('confirm-yes'));ok(!$('.modal')&&$$('[data-act="withdraw"]').length===0,'bulk withdraw done');
 nav('members?r=admin&t=out');ok(txt().includes('탈퇴')&&txt().includes('거절'),'out tab shows withdrawn/rejected');
 nav('ops?r=admin&t=all');ok(['대기','처리중','완료','실패'].every(s=>txt().includes(s))&&!txt().includes('병합')&&$$('.chip.is-danger').length===1,'ops: 4 statuses, no merge/split');
-nav('ops?r=admin&t=todo');ok(!txt().includes('완료'),'ops todo tab hides completed');
+nav('ops?r=admin&t=todo');ok($$('.chip').every(c=>c.textContent!=='완료'),'ops todo tab hides completed');
 nav('ops?r=admin&t=hidden');ok($$('[data-act="ops-unhide"]').length===1,'hidden tab lists 1');click(byAct('ops-unhide'));ok(txt().includes('해당하는 방송이 없습니다'),'unhide removes from hidden tab');
 // 미정의 클래스
 const undef=[...used].filter(c=>!defined.has(c));

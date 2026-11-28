@@ -71,11 +71,11 @@
       { id: 11, nick: '신청자00', st: 'out', joined: '2026-11-01', seen: '', done: '2026-11-02', why: '거절' }
     ],
     ops: [
-      { no: 16372880, title: '대기 중인 방송 예시', at: '2026-11-26 21:30:05', st: '대기', cls: '', hidden: false },
-      { no: 16372104, title: '처리중인 방송 예시', at: '2026-11-26 19:00:12', st: '처리중', cls: 'is-info', hidden: false },
-      { no: 16358201, title: '실패한 방송 예시', at: '2026-11-23 20:10:40', st: '실패', cls: 'is-danger', hidden: false },
-      { no: 16365315, title: M.post.title, at: M.post.start, st: '완료', cls: '', hidden: false },
-      { no: 16301177, title: '숨김 처리한 방송 예시', at: '2026-11-10 20:00:00', st: '완료', cls: '', hidden: true }
+      { no: 16372880, title: '대기 중인 방송 예시', st: '대기', cls: '', start: '', end: '', hidden: false },
+      { no: 16372104, title: '처리중인 방송 예시', st: '처리중', cls: 'is-info', start: '2026-11-26 19:00:12', end: '', hidden: false },
+      { no: 16358201, title: '실패한 방송 예시', st: '실패', cls: 'is-danger', start: '2026-11-23 20:10:40', end: '', hidden: false },
+      { no: 16365315, title: M.post.title, st: '완료', cls: '', start: '2026-11-26 03:40:10', end: '2026-11-26 04:12:51', hidden: false },
+      { no: 16301177, title: '숨김 처리한 방송 예시', st: '완료', cls: '', start: '2026-11-10 20:05:00', end: '2026-11-10 20:41:30', hidden: true }
     ]
   };
 
@@ -401,19 +401,22 @@
     h += tabs([['all', '전체', 'ops?r=admin&t=all'], ['todo', '처리필요', 'ops?r=admin&t=todo'], ['hidden', '숨김', 'ops?r=admin&t=hidden']], t);
     var list = state.ops.filter(function (o) {
       if (t === 'hidden') return o.hidden;
-      if (o.hidden) return false;
-      return t === 'all' || o.st !== '완료';
+      return t === 'all' || (!o.hidden && o.st !== '완료');
     });
     var pg = pageOf(list, q);
     h += toolbar(pg.total, null);
-    h += '<div class="list"><div class="row row-head"><span class="c-s">방송 번호</span><span class="c-s">상태</span><span class="c-fill">제목</span><span class="c-m c-hide">시작</span><span class="c-act">관리</span></div>';
+    h += '<div class="list"><div class="row row-head"><span class="c-s">방송번호</span><span class="c-fill">제목</span><span class="c-s">처리상태</span><span class="c-s">게시상태</span><span class="c-d">시작일시</span><span class="c-d">완료일시</span><span class="c-act">관리</span></div>';
     if (!list.length) h += '<div class="row mute">해당하는 방송이 없습니다.</div>';
     pg.items.forEach(function (o) {
       var act = '';
       if (o.hidden) act = rbtn('숨김해제', 'ops-unhide', o.no);
       else if (o.st === '완료' || o.st === '실패') act = rbtn('재처리', 'post-redo', o.no);
-      h += '<div class="row">' + line('<span class="c-s">' + o.no + '</span><span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + '</span></span>') +
-        '<span class="c-fill">' + esc(o.title) + '</span><span class="c-m c-hide">' + esc(o.at.slice(0, 16)) + '</span>' +
+      h += '<div class="row"><span class="c-s c-hide">' + o.no + '</span>' +
+        line('<span class="c-fill">' + esc(o.title) + '</span><span class="c-s m-end m-only">' + o.no + '</span>') +
+        line(ml('처리상태') + '<span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + '</span></span>') +
+        line(ml('게시상태') + '<span class="c-s m-end"><span class="chip">' + (o.hidden ? '숨김' : '공개') + '</span></span>') +
+        line(ml('시작일시') + '<span class="c-d m-end">' + (o.start ? esc(o.start.slice(0, 16)) : '-') + '</span>') +
+        line(ml('완료일시') + '<span class="c-d m-end">' + (o.end ? esc(o.end.slice(0, 16)) : '-') + '</span>') +
         '<span class="c-act">' + act + '</span></div>';
     });
     return shell('ops', 'admin', h + '</div>' + pager(pg, 'ops?r=admin&t=' + t));
