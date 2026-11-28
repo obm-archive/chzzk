@@ -53,7 +53,7 @@
 
   var state = {
     form: { nick: '', pw: '', grade: '', link: '', q: '', from: '', to: '', cat: '', tname: '', ttype: '닉네임', tdesc: '' },
-    err: '', modal: null, menu: false, sel: {}, idle: 0, toastTimer: null,
+    err: '', modal: null, menu: false, sel: {}, idle: 0, pub: '', toastTimer: null,
     gloss: M.glossary.map(function (g, i) {
       return { id: i + 1, term: g.term, type: g.type, desc: g.desc, author: i % 3 === 0 ? '나' : '회원' + (10 + i) };
     }),
@@ -403,22 +403,31 @@
   function vOps(q) {
     var t = q.t || 'all';
     var h = '<h1 class="title">처리 현황</h1><div class="notice is-warn">네이버 인증 정보가 곧 만료됩니다. 갱신해 주세요.</div>';
-    h += tabs([['all', '전체', 'ops?r=admin&t=all'], ['todo', '처리필요', 'ops?r=admin&t=todo'], ['hidden', '숨김', 'ops?r=admin&t=hidden']], t);
+    h += tabs([['all', '전체', 'ops?r=admin&t=all'], ['done', '완료', 'ops?r=admin&t=done'], ['todo', '대기·처리중·실패', 'ops?r=admin&t=todo']], t);
     var list = state.ops.filter(function (o) {
-      if (t === 'hidden') return o.hidden;
-      return t === 'all' || o.st !== '완료';
+      return t === 'all' || (t === 'done' ? o.st === '완료' : o.st !== '완료');
     });
+    if (t !== 'todo') {
+      h += '<div class="inline">' + [['', '전체'], ['open', '공개'], ['hide', '숨김']].map(function (x) {
+        return '<button class="chip' + (state.pub === x[0] ? ' on' : '') + '" data-act="pub" data-v="' + x[0] + '">' + x[1] + '</button>';
+      }).join('') + '</div>';
+      list = list.filter(function (o) { return !state.pub || (state.pub === 'hide') === o.hidden; });
+    }
     var pg = pageOf(list, q);
-    h += toolbar(pg.total, null);
-    h += '<div class="list"><div class="row row-head"><span class="c-s">다시보기번호</span><span class="c-fill">제목</span><span class="c-s">처리상태</span><span class="c-s">게시상태</span><span class="c-d">처리시작일시</span><span class="c-d">처리완료일시</span><span class="c-act c-act-w">관리</span></div>';
+    var picks = state.ops.filter(function (o) { return state.sel['o' + o.no]; });
+    var offHide = picks.length && picks.every(function (o) { return o.st === '완료'; }) ? '' : 'disabled';
+    var offDel = picks.length ? '' : 'disabled';
+    h += toolbar(pg.total, picks.length, btn('선택숨김', 'ops-hide-bulk', offHide, 'btn-secondary') + btn('선택삭제', 'ops-del-bulk', offDel, 'btn-secondary is-danger'));
+    h += '<div class="list"><div class="row row-head"><span class="c-xs"><label class="check"><input type="checkbox" data-act="osel-all"></label></span><span class="c-s">다시보기번호</span><span class="c-fill">제목</span><span class="c-s">처리상태</span><span class="c-s">게시상태</span><span class="c-d">처리시작일시</span><span class="c-d">처리완료일시</span><span class="c-act c-act-w">관리</span></div>';
     if (!list.length) h += '<div class="row mute">해당하는 방송이 없습니다.</div>';
     pg.items.forEach(function (o) {
       var act = '';
       if (o.st === '완료') act += o.hidden ? rbtn('공개', 'ops-show', o.no) : rbtn('숨김', 'ops-hide', o.no);
       if (o.st === '완료' || o.st === '실패') act += rbtn('재처리', 'post-redo', o.no);
       if (o.st !== '처리중') act += rbtn('삭제', 'ops-del', o.no, 'btn-secondary is-danger');
-      h += '<div class="row"><span class="c-s c-hide">' + o.no + '</span>' +
-        line('<span class="c-fill">' + esc(o.title) + '</span><span class="c-s m-end m-only">' + o.no + '</span>') +
+      var box = o.st !== '처리중' ? '<label class="check"><input type="checkbox" data-sel="o' + o.no + '"' + (state.sel['o' + o.no] ? ' checked' : '') + '></label>' : '';
+      h += '<div class="row">' +
+        line('<span class="c-xs">' + box + '</span><span class="c-s c-hide">' + o.no + '</span><span class="c-fill">' + esc(o.title) + '</span><span class="c-s m-end m-only">' + o.no + '</span>') +
         line(ml('처리상태') + '<span class="c-s m-end"><span class="chip ' + o.cls + '">' + o.st + '</span></span>') +
         line(ml('게시상태') + '<span class="c-s m-end"><span class="chip">' + (o.hidden ? '숨김' : '공개') + '</span></span>') +
         line(ml('처리시작일시') + '<span class="c-d m-end">' + (o.start ? esc(o.start.slice(0, 16)) : '-') + '</span>') +
@@ -499,6 +508,21 @@
     'post-redo': function () { toast('재처리를 요청했습니다'); },
     'ops-hide': function (el) { setOps(el, true); toast('숨김 처리했습니다'); },
     'ops-show': function (el) { setOps(el, false); toast('공개했습니다'); },
+    pub: function (el) { state.pub = el.getAttribute('data-v'); state.sel = {}; render(); },
+    'ops-hide-bulk': function () {
+      selectedIds('o').forEach(function (no) { state.ops.forEach(function (o) { if (o.no === no) o.hidden = true; }); });
+      state.sel = {}; render(); toast('선택한 방송을 숨김 처리했습니다');
+    },
+    'ops-del-bulk': function () {
+      var ids = selectedIds('o');
+      state.modal = { kind: 'confirm', what: 'ops', title: '방송 삭제', yes: '삭제', ids: ids, text: '선택한 ' + ids.length + '건을 삭제합니다.' }; render();
+    },
+    'osel-all': function (el) {
+      var on = el.checked, q = parse().q, t = q.t || 'all';
+      var rows = state.ops.filter(function (o) { return (t === 'all' || (t === 'done' ? o.st === '완료' : o.st !== '완료')) && (t === 'todo' || !state.pub || (state.pub === 'hide') === o.hidden); });
+      pageOf(rows, q).items.forEach(function (o) { if (o.st !== '처리중') state.sel['o' + o.no] = on; });
+      render();
+    },
     'ops-del': function (el) {
       state.modal = { kind: 'confirm', what: 'ops', title: '방송 삭제', yes: '삭제', ids: [+el.getAttribute('data-id')], text: '이 방송을 삭제합니다.' }; render();
     },
@@ -574,7 +598,7 @@
   document.addEventListener('change', function (e) {
     var t = e.target;
     var an = t.getAttribute && t.getAttribute('data-act');
-    if (an === 'sel-all' || an === 'gsel-all') { ACT[an](t); return; }
+    if (an === 'sel-all' || an === 'gsel-all' || an === 'osel-all') { ACT[an](t); return; }
     if (t.getAttribute && t.getAttribute('data-sel')) { state.sel[t.getAttribute('data-sel')] = t.checked; render(); }
   });
   document.addEventListener('input', function (e) {

@@ -57,8 +57,8 @@ nav('home?r=user');ok(txt().includes('전체 12건')&&$$('.pager-btn').length===
 nav('home?r=user&p=2');ok($$('.g-card').length===2,'home: last page 2 cards');
 nav('glossary?r=user');ok(txt().includes('전체')&&txt().includes('선택 0건')&&!!byAct('gdel-bulk'),'glossary toolbar with 선택삭제');
 nav('members?r=admin&t=ok');nav('members?r=admin&t=pending');ok(txt().includes('선택승인')&&txt().includes('선택거절'),'pending bulk buttons');nav('glossary?r=user');ok(!!$('[data-act="pager"]')||$$('.pager-btn').length>=3,'pager always shown');nav('members?r=admin&t=ok');ok(txt().includes('선택탈퇴')&&txt().includes('선택 0건'),'members ok toolbar 선택탈퇴');
-nav('ops?r=admin');ok(txt().includes('전체 ')&&!txt().includes('선택 0건'),'ops: total only');
-const ot=[...$$('.tabs .tab')].map(x=>x.textContent.trim()).join('/');ok(ot==='전체/처리필요/숨김','ops tab order/labels: '+ot);
+nav('ops?r=admin');ok(txt().includes('전체 5건 / 선택 0건')&&$('[data-act="ops-hide-bulk"]').disabled&&$('[data-act="ops-del-bulk"]').disabled,'ops: bulk buttons disabled without selection');
+const ot=[...$$('.tabs .tab')].map(x=>x.textContent.trim()).join('/');ok(ot==='전체/완료/대기·처리중·실패','ops tab order/labels: '+ot);
 // 탭
 nav('login');ok($$('.tabs .tab').length===2&&$$('.tab.on').length===1,'login tabs are tabs');
 nav('members?r=admin&t=ok');ok($$('.tabs .tab').length===3,'members tabs');
@@ -85,7 +85,10 @@ click(byAct('withdraw-bulk'));click(byAct('confirm-yes'));ok(!$('.modal')&&$$('[
 nav('members?r=admin&t=out');ok(txt().includes('탈퇴')&&txt().includes('거절'),'out tab shows withdrawn/rejected');
 nav('ops?r=admin&t=all');ok(['대기','처리중','완료','실패'].every(s=>txt().includes(s))&&!txt().includes('병합')&&$$('.chip.is-danger').length===1,'ops: 4 statuses, no merge/split');
 nav('ops?r=admin&t=todo');ok($$('.chip').every(c=>c.textContent!=='완료'),'ops todo tab hides completed');
-nav('ops?r=admin&t=hidden');ok($$('[data-act="ops-show"]').length===1,'hidden tab: 1 publishable');click(byAct('ops-show'));ok($$('[data-act="ops-show"]').length===0,'publish removes from hidden tab');
+nav('ops?r=admin&t=all');click($('[data-act="pub"][data-v="hide"]'));ok($$('[data-act="ops-show"]').length===1&&txt().includes('전체 4건'),'ops: hide filter lists 4, 1 publishable');click(byAct('ops-show'));ok($$('[data-act="ops-show"]').length===0,'publish removes from hide filter');
+nav('ops?r=admin&t=todo');ok(!$('[data-act="pub"]'),'ops todo tab has no publish filter');
+nav('ops?r=admin&t=all');click($('[data-act="pub"][data-v=""]'));$$('[data-sel^="o"]')[0].checked=true;$$('[data-sel^="o"]')[0].dispatchEvent(new w.Event('change',{bubbles:true}));ok(!$('[data-act="ops-del-bulk"]').disabled&&$('[data-act="ops-hide-bulk"]').disabled,'ops: select non-completed -> delete on, hide off');
+click(byAct('ops-del-bulk'));ok(txt().includes('선택한 1건을 삭제합니다.'),'ops bulk delete confirm');click(byAct('confirm-yes'));ok(txt().includes('전체 4건'),'ops bulk delete removes');
 // 미정의 클래스
 const undef=[...used].filter(c=>!defined.has(c));
 ok(undef.length===0,'all DOM classes defined in CSS '+(undef.length?JSON.stringify(undef):''));
