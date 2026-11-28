@@ -415,9 +415,8 @@
     }
     var pg = pageOf(list, q);
     var picks = state.ops.filter(function (o) { return state.sel['o' + o.no]; });
-    var offHide = picks.length && picks.every(function (o) { return o.st === '완료'; }) ? '' : 'disabled';
     var offDel = picks.length ? '' : 'disabled';
-    h += toolbar(pg.total, picks.length, btn('선택숨김', 'ops-hide-bulk', offHide, 'btn-secondary') + btn('선택삭제', 'ops-del-bulk', offDel, 'btn-secondary is-danger'));
+    h += toolbar(pg.total, picks.length, btn('선택삭제', 'ops-del-bulk', offDel, 'btn-secondary is-danger'));
     h += '<div class="list"><div class="row row-head"><span class="c-xs"><label class="check"><input type="checkbox" data-act="osel-all"></label></span><span class="c-s">다시보기번호</span><span class="c-fill">제목</span><span class="c-s">처리상태</span><span class="c-s">게시상태</span><span class="c-d">처리시작일시</span><span class="c-d">처리완료일시</span><span class="c-act c-act-w">관리</span></div>';
     if (!list.length) h += '<div class="row mute">해당하는 방송이 없습니다.</div>';
     pg.items.forEach(function (o) {
@@ -509,10 +508,6 @@
     'ops-hide': function (el) { setOps(el, true); toast('숨김 처리했습니다'); },
     'ops-show': function (el) { setOps(el, false); toast('공개했습니다'); },
     pub: function (el) { state.pub = el.getAttribute('data-v'); state.sel = {}; render(); },
-    'ops-hide-bulk': function () {
-      selectedIds('o').forEach(function (no) { state.ops.forEach(function (o) { if (o.no === no) o.hidden = true; }); });
-      state.sel = {}; render(); toast('선택한 방송을 숨김 처리했습니다');
-    },
     'ops-del-bulk': function () {
       var ids = selectedIds('o');
       state.modal = { kind: 'confirm', what: 'ops', title: '방송 삭제', yes: '삭제', ids: ids, text: '선택한 ' + ids.length + '건을 삭제합니다.' }; render();
