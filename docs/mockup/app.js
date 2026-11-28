@@ -321,7 +321,7 @@
     var h = '<h1 class="title">내 정보</h1><div class="card stack">' +
       '<div class="field"><span class="label">닉네임</span><span>' + esc(state.form.nick || (r === 'admin' ? '관리자' : '회원')) + '</span></div>' +
       '<div class="field"><span class="label">권한</span><span>' + (r === 'admin' ? '관리자' : '멤버') + '</span></div>' +
-      '<div class="field"><span class="label">최근 접속</span><span>' + TODAY + '</span></div></div>' +
+      '<div class="field"><span class="label">최근 접속일</span><span>' + TODAY + '</span></div></div>' +
       '<div class="inline"><button class="btn btn-secondary" data-go="login">로그아웃</button></div>';
     return shell('me', r, h);
   }
@@ -366,8 +366,8 @@
       t === 'pending' ? toolbar(pg.total, picked, btn('선택승인', 'm-approve-bulk', off, 'btn-primary') + btn('선택거절', 'm-reject-bulk', off, 'btn-secondary is-danger')) : toolbar(pg.total, null);
     var head = '';
     if (t === 'pending') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">등급 답변</span><span class="c-s">최근 게시물</span><span class="c-s">가입일</span><span class="c-act">관리</span>';
-    if (t === 'ok') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-m">최근 접속</span><span class="c-act">관리</span>';
-    if (t === 'out') head = '<span class="c-fill">닉네임</span><span class="c-s">상태</span><span class="c-s">가입일</span><span class="c-s">처리일</span>';
+    if (t === 'ok') head = '<span class="c-xs"><label class="check"><input type="checkbox" data-act="sel-all"></label></span><span class="c-fill">닉네임</span><span class="c-s">가입일</span><span class="c-d">최근 접속일</span><span class="c-act">관리</span>';
+    if (t === 'out') head = '<span class="c-fill">닉네임</span><span class="c-s">처리상태</span><span class="c-s">가입일</span><span class="c-s">처리일</span>';
     h += '<div class="list"><div class="row row-head">' + head + '</div>';
     if (!list.length) h += '<div class="row mute">해당하는 멤버가 없습니다.</div>';
     pg.items.forEach(function (m) {
@@ -382,12 +382,12 @@
       }
       if (t === 'ok') {
         row = line('<span class="c-xs"><label class="check"><input type="checkbox" data-sel="m' + m.id + '"' + (state.sel['m' + m.id] ? ' checked' : '') + '></label></span>' + nick + '<span class="c-s m-end">' + esc(m.joined) + '</span>') +
-          line(ml('최근 접속') + '<span class="c-m nowrap m-end">' + esc(m.seen) + ' <span class="mute">(' + daysAgo(m.seen) + '일 전)</span></span>') +
+          line(ml('최근 접속일') + '<span class="c-d nowrap m-end">' + esc(m.seen) + ' <span class="mute">(' + daysAgo(m.seen) + '일 전)</span></span>') +
           '<span class="c-act">' + rbtn('탈퇴', 'withdraw', m.id, 'btn-secondary is-danger') + '</span>';
       }
       if (t === 'out') {
         row = line(nick + '<span class="c-s m-end m-only">' + esc(m.joined) + '</span>') +
-          line(ml('상태') + '<span class="c-s m-end"><span class="chip">' + esc(m.why) + '</span></span>') +
+          line(ml('처리상태') + '<span class="c-s m-end"><span class="chip">' + esc(m.why) + '</span></span>') +
           '<span class="c-s c-hide">' + esc(m.joined) + '</span>' +
           line(ml('처리일') + '<span class="c-s m-end">' + esc(m.done) + '</span>');
       }

@@ -12,7 +12,7 @@ DEVICES = {'pc': (1440, 900), 'tab': (900, 1100), 'mo': (390, 844)}
 
 # (파일명, 해시, 촬영 전 클릭할 선택자 목록)
 # 토스트(2초)가 사라진 뒤 찍어야 하는 캡처
-WAIT = {'members-empty': 2400}
+WAIT = {'members-empty': 2400, 'ops-empty': 2400}
 
 JOBS = [
     ('intro-home',             'home?r=user', []),
@@ -24,6 +24,16 @@ JOBS = [
     ('members-toast-approve',  'members?r=admin&t=pending', ['[data-act="m-approve"]']),
     ('members-toast-reject',   'members?r=admin&t=pending', ['[data-act="m-reject"]']),
     ('members-toast-withdraw', 'members?r=admin&t=ok', ['[data-act="withdraw"]', '[data-act="confirm-yes"]']),
+    ('ops-all',          'ops?r=admin&t=all', []),
+    ('ops-done',         'ops?r=admin&t=done', []),
+    ('ops-todo',         'ops?r=admin&t=todo', []),
+    ('ops-sel',          'ops?r=admin&t=all', ['[data-sel="o16358201"]']),
+    ('ops-toast-hide',   'ops?r=admin&t=all', ['[data-act="ops-hide"]']),
+    ('ops-toast-show',   'ops?r=admin&t=all', ['[data-act="ops-show"]']),
+    ('ops-toast-redo',   'ops?r=admin&t=all', ['[data-act="post-redo"]']),
+    ('ops-delete-modal', 'ops?r=admin&t=all', ['[data-act="ops-del"]']),
+    ('ops-toast-delete', 'ops?r=admin&t=all', ['[data-act="ops-del"]', '[data-act="confirm-yes"]']),
+    ('ops-empty',        'ops?r=admin&t=done', ['[data-act="pub"][data-v="hide"]', '[data-act="ops-show"]']),
     ('members-empty',          'members?r=admin&t=ok', ['[data-act="idle"][data-v="90"]', '[data-act="withdraw"]', '[data-act="confirm-yes"]']),
 ]
 
